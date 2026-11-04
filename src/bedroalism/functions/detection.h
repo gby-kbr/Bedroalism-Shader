@@ -2,7 +2,6 @@
 #define BR_DETECTION_H
 
 // Detection functions for Bedroalism Shader.
-// Requires config.h to be included first (see insert.sh).
 //
 // Inputs follow the standard material uniforms:
 //   TIME_OF_DAY  : TimeOfDay.x
@@ -96,11 +95,11 @@ float brDetectDayFactor(float TIME_OF_DAY) {
 }
 
 float brDetectDay(float dayFactor) {
-  return smoothstep(0.0, BR_DAY_FULL_ELEVATION, dayFactor);
+  return smoothstep(0.0, 0.4, dayFactor);
 }
 
 float brDetectNight(float dayFactor) {
-  return 1.0 - smoothstep(BR_NIGHT_FULL_ELEVATION, 0.0, dayFactor);
+  return 1.0 - smoothstep(-0.22, 0.0, dayFactor);
 }
 
 // Transition between day and night; day + night + twilight = 1.0
@@ -128,16 +127,16 @@ float brDetectSunset(float TIME_OF_DAY) {
 vec3 brGetSunDirection(float TIME_OF_DAY) {
   float t = 2.0 * BR_PI * TIME_OF_DAY;
   vec3 sunDir = vec3(sin(t), cos(t), 0.0);
-  sunDir.yz = mul(brRotation2D(-brDegToRad(BR_SUN_PATH_TILT)), sunDir.yz);
-  sunDir.xz = mul(brRotation2D(brDegToRad(BR_SUN_PATH_YAW)), sunDir.xz);
+  sunDir.yz = mul(brRotation2D(-brDegToRad(31.0)), sunDir.yz);
+  sunDir.xz = mul(brRotation2D(brDegToRad(15.0)), sunDir.xz);
   return sunDir;
 }
 
 vec3 brGetMoonDirection(float TIME_OF_DAY) {
   float t = 2.0 * BR_PI * TIME_OF_DAY;
   vec3 moonDir = vec3(-sin(t), -cos(t), 0.0);
-  moonDir.yz = mul(brRotation2D(-brDegToRad(BR_MOON_PATH_TILT)), moonDir.yz);
-  moonDir.xz = mul(brRotation2D(brDegToRad(BR_MOON_PATH_YAW)), moonDir.xz);
+  moonDir.yz = mul(brRotation2D(brDegToRad(28.0)), moonDir.yz);
+  moonDir.xz = mul(brRotation2D(brDegToRad(17.0)), moonDir.xz);
   return moonDir;
 }
 
