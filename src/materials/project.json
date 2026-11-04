@@ -13,7 +13,7 @@
       "Weather"
     ],
     "exclude_patterns": [".*", "_*"],
-    "include_search_paths": ["../include"]
+    "include_search_paths": ["../include", "../../src", "../../include"]
   },
   "profiles": {
     "multiplatform": {

@@ -7,13 +7,21 @@ $output v_color0, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
 
+#ifndef INSTANCING
+    #include <bedroalism/config.h>
+    #include <bedroalism/functions/sunmoon.h>
+
+    uniform vec4 TimeOfDay;
+#endif
+
 void main() {
     vec3 worldPosition;
 #ifdef INSTANCING
     mat4 model = mtxFromCols(i_data1, i_data2, i_data3, vec4(0.0, 0.0, 0.0, 1.0));
     worldPosition = instMul(model, vec4(a_position, 1.0)).xyz;
 #else
-    worldPosition = mul(u_model[0], vec4(a_position, 1.0)).xyz;
+    vec2 modelDir = mul(u_model[0], vec4(0.0, 0.0, 0.0, 1.0)).xy;
+    worldPosition = brSunMoonPosition(a_position, modelDir, TimeOfDay.x).xyz;
 #endif
 
     v_color0 = a_color0;

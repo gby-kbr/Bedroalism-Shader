@@ -10,6 +10,8 @@
 /* Sun/Moon size */
 #define BR_SUN_SIZE  1.0 // 0.3 tiny ~ 4.0 massive
 #define BR_MOON_SIZE 1.0 // 0.3 tiny ~ 4.0 massive
+#define BR_SUN_TILT  45.0 // rotation of the sun texture: 0.0 no tilt ~ 90.0
+#define BR_MOON_TILT 45.0 // rotation of the moon texture: 0.0 no tilt ~ 90.0
 
 /* Sky colors (0.0 ~ 1.0) */
 #define BR_DAY_ZENITH_COL      vec3(0.20, 0.42, 0.82)
