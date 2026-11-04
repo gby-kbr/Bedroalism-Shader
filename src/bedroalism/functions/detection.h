@@ -79,16 +79,16 @@ float brDetectSunset(float TIME_OF_DAY) {
 vec3 brGetSunDirection(float TIME_OF_DAY) {
   float t = 2.0 * BR_PI * TIME_OF_DAY;
   vec3 sunDir = vec3(sin(t), cos(t), 0.0);
-  sunDir.yz = mul(brRotation2D(-brDegToRad(31.0)), sunDir.yz);
-  sunDir.xz = mul(brRotation2D(brDegToRad(15.0)), sunDir.xz);
+  sunDir.yz = mul(brRotation2D(-brDegToRad(BR_SUN_PATH_TILT)), sunDir.yz);
+  sunDir.xz = mul(brRotation2D(brDegToRad(BR_SUN_PATH_YAW)), sunDir.xz);
   return sunDir;
 }
 
 vec3 brGetMoonDirection(float TIME_OF_DAY) {
   float t = 2.0 * BR_PI * TIME_OF_DAY;
   vec3 moonDir = vec3(-sin(t), -cos(t), 0.0);
-  moonDir.yz = mul(brRotation2D(brDegToRad(28.0)), moonDir.yz);
-  moonDir.xz = mul(brRotation2D(brDegToRad(17.0)), moonDir.xz);
+  moonDir.yz = mul(brRotation2D(-brDegToRad(BR_MOON_PATH_TILT)), moonDir.yz);
+  moonDir.xz = mul(brRotation2D(brDegToRad(BR_MOON_PATH_YAW)), moonDir.xz);
   return moonDir;
 }
 

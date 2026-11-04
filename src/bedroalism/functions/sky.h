@@ -10,22 +10,22 @@ struct brSkyColor {
 
 brSkyColor brDaySkyColor() {
   brSkyColor s;
-  s.zenith = vec3(0.20, 0.42, 0.82);
-  s.horizon = vec3(0.68, 0.79, 0.92);
+  s.zenith = BR_DAY_ZENITH_COL;
+  s.horizon = BR_DAY_HORIZON_COL;
   return s;
 }
 
 brSkyColor brSunriseSkyColor() {
   brSkyColor s;
-  s.zenith = vec3(0.22, 0.33, 0.60);
-  s.horizon = vec3(0.98, 0.60, 0.45);
+  s.zenith = BR_SUNRISE_ZENITH_COL;
+  s.horizon = BR_SUNRISE_HORIZON_COL;
   return s;
 }
 
 brSkyColor brSunsetSkyColor() {
   brSkyColor s;
-  s.zenith = vec3(0.20, 0.28, 0.52);
-  s.horizon = vec3(0.98, 0.48, 0.25);
+  s.zenith = BR_SUNSET_ZENITH_COL;
+  s.horizon = BR_SUNSET_HORIZON_COL;
   return s;
 }
 
@@ -33,8 +33,8 @@ brSkyColor brSunsetSkyColor() {
 brSkyColor brNightSkyColor(float night) {
   float afterglow = 1.0 + 2.0*(1.0 - night);
   brSkyColor s;
-  s.zenith = vec3(0.008, 0.048, 0.08)*afterglow;
-  s.horizon = vec3(0.02, 0.06, 0.10)*afterglow;
+  s.zenith = BR_NIGHT_ZENITH_COL*afterglow;
+  s.horizon = BR_NIGHT_HORIZON_COL*afterglow;
   return s;
 }
 
@@ -42,11 +42,11 @@ brSkyColor brNightSkyColor(float night) {
 brSkyColor brRainSkyColor(brSkyColor clear, float rainFactor) {
   float zh = dot(clear.zenith, vec3(0.333, 0.333, 0.333));
   float hh = dot(clear.horizon, vec3(0.333, 0.333, 0.333));
-  float rainMix = rainFactor*0.9;
+  float rainMix = rainFactor*BR_SKY_RAIN_MIX_FACTOR;
 
   brSkyColor s;
-  s.zenith = mix(clear.zenith, vec3(0.78, 0.84, 0.92)*zh, rainMix);
-  s.horizon = mix(clear.horizon, vec3(0.85, 0.85, 0.85)*hh, rainMix);
+  s.zenith = mix(clear.zenith, BR_RAIN_ZENITH_COL*zh, rainMix);
+  s.horizon = mix(clear.horizon, BR_RAIN_HORIZON_COL*hh, rainMix);
   return s;
 }
 
