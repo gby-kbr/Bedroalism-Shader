@@ -7,6 +7,10 @@
 #define BR_SUN_PATH_TILT   31.0
 #define BR_MOON_PATH_TILT -28.0
 
+/* Sun/Moon size */
+#define BR_SUN_SIZE  1.0 // 0.3 tiny ~ 4.0 massive
+#define BR_MOON_SIZE 1.0 // 0.3 tiny ~ 4.0 massive
+
 /* Sky colors (0.0 ~ 1.0) */
 #define BR_DAY_ZENITH_COL      vec3(0.20, 0.42, 0.82)
 #define BR_DAY_HORIZON_COL     vec3(0.68, 0.79, 0.92)
