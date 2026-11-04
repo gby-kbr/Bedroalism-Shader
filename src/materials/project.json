@@ -1,0 +1,24 @@
+{
+  "base_profile": {
+    "platforms": ["ESSL_310"],
+    "merge_source": ["../tools/materials"],
+    "include_patterns": [
+      "Actor",
+      "Clouds",
+      "EndSky",
+      "RenderChunk",
+      "Sky",
+      "Stars",
+      "SunMoon",
+      "Weather"
+    ],
+    "exclude_patterns": [".*", "_*"],
+    "include_search_paths": ["../include"]
+  },
+  "profiles": {
+    "multiplatform": {
+      "macros": [],
+      "platforms": ["ESSL_310", "Direct3D_SM50", "Metal"]
+    }
+  }
+}
