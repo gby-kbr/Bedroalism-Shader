@@ -10,6 +10,7 @@ struct brEnvironment {
   bool underwater;
   bool underLava;   // also counted as nether
   float rainFactor; // [0.0, 1.0]
+  float dayFactor;  // [-1.0, 1.0]
   float day;        // [0.0, 1.0]
   float night;      // [0.0, 1.0]
   float twilight;   // [0.0, 1.0] sunrise + sunset
