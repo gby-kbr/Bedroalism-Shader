@@ -18,7 +18,7 @@
 #define BR_GAMMA    2.2 // 1.8 bright ~ 2.6 dark
 
 /* Night ambient (overworld sky light only, other times and light sources stay untouched) */
-#define BR_NIGHT_AMBIENT 0.8 // 1.0 no change ~ 0.0 pitch black
+#define BR_NIGHT_AMBIENT 0.5 // 1.0 no change ~ 0.0 pitch black
 
 /* Sky colors (linear, before exposure, tonemap and gamma) */
 #define BR_DAY_ZENITH_COL      vec3(0.0503, 0.1517, 0.5165)
