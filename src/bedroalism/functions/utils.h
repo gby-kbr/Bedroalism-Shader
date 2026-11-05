@@ -3,11 +3,11 @@
 
 #define BR_PI 3.141592
 
-// 2D rotation matrix for angle t (radians)
-mat2 brRotation2D(float t) {
-  float sint = sin(t);
-  float cost = cos(t);
-  return mtxFromRows(vec2(cost, -sint), vec2(sint, cost));
+// rotates v counter-clockwise by t (radians)
+vec2 brRotate2D(vec2 v, float t) {
+  float c = cos(t);
+  float s = sin(t);
+  return vec2(c*v.x - s*v.y, s*v.x + c*v.y);
 }
 
 float brDegToRad(float t) {
