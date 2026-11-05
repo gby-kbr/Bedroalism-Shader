@@ -1,13 +1,6 @@
 #ifndef BR_COLORCORRECTION_H
 #define BR_COLORCORRECTION_H
 
-#include "detection.h"
-
-// exposure for the current time of day, day + twilight + night = 1.0 (see detection.h)
-float brGetExposure(brEnvironment env) {
-  return env.day*BR_EXPOSURE_DAY + env.twilight*BR_EXPOSURE_TWILIGHT + env.night*BR_EXPOSURE_NIGHT;
-}
-
 // Uchimura 2017, "HDR theory and practice", with the original parameters
 float brUchimura(float x) {
   const float P = 1.0;  // max display brightness
@@ -40,8 +33,8 @@ vec3 brTonemap(vec3 col) {
 }
 
 // col: linear scene color, returns the color to display
-vec3 brColorCorrection(vec3 col, float exposure) {
-  col = brTonemap(col*exposure);
+vec3 brColorCorrection(vec3 col) {
+  col = brTonemap(col*BR_EXPOSURE);
   return pow(col, vec3_splat(1.0 / BR_GAMMA));
 }
 

@@ -2,8 +2,12 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
+#include <bedroalism/config.h>
+#include <bedroalism/functions/lighting.h>
 
 uniform vec4 FogColor;
+uniform vec4 FogAndDistanceControl;
+uniform vec4 TimeOfDay;
 uniform vec4 DitherParams;
 uniform vec4 DitherParams2[3];
 uniform vec4 ViewPositionAndTime;
@@ -67,6 +71,7 @@ void main() {
 #endif
 
     diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
+    diffuse.rgb *= brGetNightAmbient(v_lightmapUV, TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
     diffuse.rgb = mix(diffuse.rgb, FogColor.rgb, v_fog.a);
 
     gl_FragColor = diffuse;

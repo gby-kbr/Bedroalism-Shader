@@ -5,6 +5,7 @@
 #include "functions/detection.h"
 #include "functions/sky.h"
 #include "functions/colorcorrection.h"
+#include "functions/lighting.h"
 #include "functions/sunmoon.h"
 
 #endif
