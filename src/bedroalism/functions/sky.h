@@ -31,7 +31,7 @@ brSkyColor brSunsetSkyColor() {
 
 // night factor [0.0, 1.0]: brighter right after dusk, darkest at full night
 brSkyColor brNightSkyColor(float night) {
-  float afterglow = 1.0 + 2.0*(1.0 - night);
+  float afterglow = 1.0 + BR_SKY_AFTERGLOW*(1.0 - night);
   brSkyColor s;
   s.zenith = BR_NIGHT_ZENITH_COL*afterglow;
   s.horizon = BR_NIGHT_HORIZON_COL*afterglow;
