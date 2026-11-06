@@ -9,7 +9,7 @@
   "default_texture": "",
   "unordered_access": false,
   "slot_count": 1,
-  "texture_path": "textures/bedroalism/cloud_noise",
+  "texture_path": "textures/environment/cloud_noise",
   "unknown": 0,
   "sampler_state": {
     "filter": "Bilinear",
