@@ -30,9 +30,9 @@ OUT_DIR = os.path.normpath(os.path.join(HERE, "..", "mcpack", "textures", "envir
 MOON_SOURCE = os.path.join(HERE, "sources", "moon_nasa.jpg")
 
 SUN_SIZE = 256
-SUN_DISC = 0.60      # disc diameter as a fraction of the tile, the rest is glow
+SUN_DISC = 0.25      # disc diameter as a fraction of the tile (vanilla: 8 of 32 px), the rest is glow
 MOON_TILE = 540
-MOON_DISC = 0.90     # disc diameter as a fraction of the tile
+MOON_DISC = 0.25     # disc diameter as a fraction of the tile (vanilla: 8 of 32 px)
 
 # (phase angle in degrees, waxing). 0 degrees is a full moon, 180 degrees a new moon
 PHASES = [(0, False), (45, False), (90, False), (135, False), (180, False), (135, True), (90, True), (45, True)]
@@ -59,7 +59,7 @@ def make_sun():
     disc_a = np.clip(radius + 0.5 - r, 0.0, 1.0)
 
     # glow: falls off from the rim, reaches zero before the tile edge
-    glow_a = 0.55 * np.exp(-np.clip(r - radius, 0.0, None) / (0.07 * n)) * (1.0 - smoothstep(0.34 * n, 0.5 * n, r))
+    glow_a = 0.22 * np.exp(-np.clip(r - radius, 0.0, None) / (0.10 * n)) * (1.0 - smoothstep(0.30 * n, 0.5 * n, r))
     glow_col = np.array([1.00, 0.93, 0.80])
 
     alpha = disc_a + glow_a * (1.0 - disc_a)
@@ -92,11 +92,14 @@ def moon_albedo_tile():
     gray = np.asarray(src.convert("L").filter(ImageFilter.GaussianBlur(2)), dtype=float)
     cx, cy, radius = fit_circle(gray)
     target_r = MOON_DISC * MOON_TILE / 2.0
-    scale = radius / target_r                       # source pixels per tile pixel
-    half = MOON_TILE / 2.0 * scale
-    box = (cx - half, cy - half, cx + half, cy + half)
-    tile = src.resize((MOON_TILE, MOON_TILE), Image.LANCZOS, box=box)
-    return np.asarray(tile, dtype=float) / 255.0, target_r
+    # cut out the disc with a small margin, shrink it to the size it has in the tile, and centre it on a black tile
+    margin = 1.02
+    box = (cx - margin * radius, cy - margin * radius, cx + margin * radius, cy + margin * radius)
+    size = int(round(2.0 * margin * target_r / 2.0)) * 2
+    disc = src.resize((size, size), Image.LANCZOS, box=box)
+    tile = Image.new("RGB", (MOON_TILE, MOON_TILE), (0, 0, 0))
+    tile.paste(disc, ((MOON_TILE - size) // 2, (MOON_TILE - size) // 2))
+    return np.asarray(tile, dtype=float) / 255.0, size / (2.0 * margin)
 
 
 def make_moon():
