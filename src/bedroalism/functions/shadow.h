@@ -1,0 +1,44 @@
+#ifndef BR_SHADOW_H
+#define BR_SHADOW_H
+
+#include "detection.h"
+
+// Shadows of the blocks. The game gives no depth from the sun, so there is no shadow map: a shadow is
+// decided from what a block knows about itself. Two parts, both 0.0 lit ~ 1.0 fully shadowed:
+//   - the light of the block: sky light below the top of the range means a roof or an overhang, torch
+//     light takes the shadow away again (a lit cave wall is not dark)
+//   - the faces turned away from the light: this part follows the sun, and the moon at night
+
+// shadow from the light level of the block
+// lightmapUV: x = block light, y = sky light, both 0.0 ~ 1.0
+float brLightmapShadow(vec2 lightmapUV) {
+  float shadow = 1.0 - smoothstep(0.860, 0.875, pow(lightmapUV.y, 2.0));
+  return mix(shadow, 0.0, clamp(pow(lightmapUV.x*1.2, 6.0), 0.0, 1.0)); // above 1.0 the mix would brighten
+}
+
+// the light that counts: the sun while it is up, the moon after it, blended when both are near the horizon
+// returns dot(faceNormal, direction of the light), 1.0 faces the light, -1.0 faces away
+float brFaceToLight(vec3 faceNormal, brEnvironment env) {
+  float sunUp = smoothstep(-0.10, 0.10, env.sunDir.y);
+  return mix(dot(faceNormal, env.moonDir), dot(faceNormal, env.sunDir), sunUp);
+}
+
+// shadow of the faces that look away from the light. The top faces never get it, they look at the sky
+// faceNormal: normal of the face, outward (facing the camera). vertexG: green of the vertex color, the
+// face brightness the game bakes in (1.0 top, 0.8 north and south, 0.6 east and west, 0.5 bottom)
+float brSideShadow(vec3 faceNormal, float vertexG, brEnvironment env) {
+  float fixedShadow = 1.0 - smoothstep(0.62, 0.64, vertexG); // the faces the game darkens, always the same
+  float follow = 1.0 - smoothstep(0.0, 0.08, brFaceToLight(faceNormal, env));
+  follow *= 1.0 - step(0.5, faceNormal.y);                   // not on the top faces
+  float amount = BR_SHADOW_SUN_FOLLOW*float(env.overworld);  // nether and end have no sun
+  return mix(fixedShadow, follow, amount);
+}
+
+// color of a block with its shadows
+vec3 brShadow(vec3 col, vec2 lightmapUV, vec3 faceNormal, float vertexG, brEnvironment env) {
+  col *= 1.0 - BR_SHADOW_STRENGTH*brLightmapShadow(lightmapUV);
+  col *= 1.0 - BR_SHADOW_STRENGTH*brSideShadow(faceNormal, vertexG, env);
+  return col;
+}
+
+#endif

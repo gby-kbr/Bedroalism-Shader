@@ -5,6 +5,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/config.h>
 #include <bedroalism/functions/lighting.h>
 #include <bedroalism/functions/underwater.h>
+#include <bedroalism/functions/shadow.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 FogColor;
@@ -80,9 +81,14 @@ void main() {
     vec3 viewDir = relPos/max(camDist, 0.0001);
 
     bool isWater = false;
-#if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS))
-    // derivatives are taken outside the branch, they are only defined when all pixels of a block run them
+    // derivatives are taken outside any branch, they are only defined when all pixels of a block run them
+    // the normal of a visible face points toward the camera, which also fixes the sign the winding gives
     vec3 geoNormal = normalize(cross(dFdx(v_worldPos), dFdy(v_worldPos)));
+    if (dot(geoNormal, viewDir) > 0.0) {
+        geoNormal = -geoNormal;
+    }
+
+#if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS))
     if (v_water.x > 0.5) {
         isWater = true;
         brSkyColor sky = brSkyColors(env);
@@ -93,8 +99,6 @@ void main() {
         if (top) {
             vec2 wavePos = brWaterCoord(relPos.xz, CameraPosition.xz);
             nrm = brWaterNormal(wavePos, ViewPositionAndTime.w, camDist);
-        } else if (dot(nrm, viewDir) > 0.0) {
-            nrm = -nrm; // the winding of the face decides the sign, make it face the camera
         }
 
         vec4 water;
@@ -114,6 +118,7 @@ void main() {
     if (!isWater) {
         diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
         diffuse.rgb *= brGetNightAmbient(v_lightmapUV, TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+        diffuse.rgb = brShadow(diffuse.rgb, v_lightmapUV, geoNormal, v_color0.g, env);
     }
 
     if (env.underwater) {

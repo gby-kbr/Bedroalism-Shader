@@ -17,6 +17,10 @@
 #define BR_SUN_GLOW  1.0 // 0.0 none ~ 2.0 strong
 #define BR_MOON_GLOW 1.0 // 0.0 none ~ 2.0 strong
 
+/* Shadow */
+#define BR_SHADOW_STRENGTH   0.65 // 0.0 none ~ 1.0 black
+#define BR_SHADOW_SUN_FOLLOW 1.0  // 0.0 side shadows always on the same faces ~ 1.0 side shadows follow the sun and moon
+
 /* Water */
 #define BR_WATER_COLOR      vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
 #define BR_WATER_OPACITY    0.35 // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
