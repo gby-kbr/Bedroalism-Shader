@@ -3,7 +3,7 @@
 
 #include "sky.h"
 
-// Clouds are built from one tileable noise texture (RGBA, see tools/generate_cloud_noise.py):
+// Clouds are built from one tileable noise texture (RGBA, textures/environment/cloud_noise.png):
 // R, G, B, A hold 4 octaves of noise from low to high frequency, so 1 fetch = 4 octaves.
 //
 // The cumulus layer is a slab of fixed thickness above the camera. The view ray is marched through the slab
