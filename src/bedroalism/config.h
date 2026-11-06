@@ -20,9 +20,12 @@
 /* Torch light */
 #define BR_TORCH_INTENSITY 3.0 // 1.0 weak ~ 6.0 bright
 #define BR_TORCH_RADIUS    2.0 // blocks where the light has dropped to half, 1.0 tight ~ 4.0 wide
-#define BR_TORCH_FLICKER   0.12 // 0.0 steady ~ 0.4 strong flicker
-#define BR_TORCH_COLOR            vec3(1.00, 0.52, 0.18) // overworld, nether and end
-#define BR_UNDERWATER_TORCH_COLOR vec3(1.00, 0.60, 0.30) // before the water takes the red out of it
+#define BR_TORCH_FLICKER   0.07 // 0.0 steady ~ 0.2 lively, the light never drops by more than this fraction
+// flame colors (linear), a wood or oil flame is about 1900 K: strongly red, half as much green, little blue
+#define BR_OVERWORLD_TORCH_COL    vec3(1.00, 0.56, 0.22)
+#define BR_NETHER_TORCH_COL       vec3(1.00, 0.60, 0.24) // a touch yellower so it stands out from the red air
+#define BR_END_TORCH_COL          vec3(1.00, 0.58, 0.22)
+#define BR_UNDERWATER_TORCH_COL   vec3(1.00, 0.62, 0.28) // before the water takes the red out of it
 
 /* Shadow */
 #define BR_SHADOW_STRENGTH   0.65 // 0.0 none ~ 1.0 black
