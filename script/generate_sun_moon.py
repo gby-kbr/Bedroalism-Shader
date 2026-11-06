@@ -3,7 +3,7 @@
 mcpack/textures/environment/sun.png          256x256 RGBA, round sun
 mcpack/textures/environment/moon_phases.png  2160x1080 RGBA, 4x2 tiles of 540x540, the 8 phases
 
-Sun: a disc with limb darkening (centre white, rim warmer) and a soft glow around it.
+Sun: a disc with limb darkening (centre white, rim warmer), without glow.
 
 Moon: the real surface comes from a NASA photograph of the near side (tools/sources/moon_nasa.jpg),
 which is almost a full moon, so it works as the albedo. Every phase relights that albedo on a sphere:
@@ -30,7 +30,7 @@ OUT_DIR = os.path.normpath(os.path.join(HERE, "..", "mcpack", "textures", "envir
 MOON_SOURCE = os.path.join(HERE, "sources", "moon_nasa.jpg")
 
 SUN_SIZE = 256
-SUN_DISC = 0.25      # disc diameter as a fraction of the tile (vanilla: 8 of 32 px), the rest is glow
+SUN_DISC = 0.25      # disc diameter as a fraction of the tile (vanilla: 8 of 32 px)
 MOON_TILE = 540
 MOON_DISC = 0.25     # disc diameter as a fraction of the tile (vanilla: 8 of 32 px)
 
@@ -58,13 +58,10 @@ def make_sun():
     disc_col = (rim[None, None, :] * (1.0 - mu[..., None]) + centre[None, None, :] * mu[..., None]) * limb[..., None]
     disc_a = np.clip(radius + 0.5 - r, 0.0, 1.0)
 
-    # glow: falls off from the rim, reaches zero before the tile edge
-    glow_a = 0.22 * np.exp(-np.clip(r - radius, 0.0, None) / (0.10 * n)) * (1.0 - smoothstep(0.30 * n, 0.5 * n, r))
-    glow_col = np.array([1.00, 0.93, 0.80])
-
-    alpha = disc_a + glow_a * (1.0 - disc_a)
-    # color is premultiplied outside the disc so additive and alpha blending both give the same glow
-    rgb = disc_col * disc_a[..., None] + glow_col[None, None, :] * (glow_a * (1.0 - disc_a))[..., None]
+    # no glow here: the sky material draws the glow around the sun (functions/glow.h), and the global
+    # gamma would inflate a faint glow baked into the texture
+    rgb = disc_col * disc_a[..., None]
+    alpha = disc_a
     out = np.dstack([np.clip(rgb, 0, 1), np.clip(alpha, 0, 1)])
     return Image.fromarray((out * 255.0 + 0.5).astype(np.uint8), "RGBA")
 

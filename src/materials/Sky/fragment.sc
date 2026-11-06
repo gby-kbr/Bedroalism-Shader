@@ -8,6 +8,7 @@
     #include <bedroalism/config.h>
     #include <bedroalism/functions/detection.h>
     #include <bedroalism/functions/sky.h>
+    #include <bedroalism/functions/glow.h>
     #include <bedroalism/functions/clouds.h>
     #include <bedroalism/functions/colorcorrection.h>
 
@@ -28,6 +29,7 @@ void main() {
     brSkyColor skyCol = brSkyColors(env);
 
     vec3 color = brSkyGradient(viewDir, skyCol);
+    color += brSunMoonGlow(viewDir, env);
 
     if (!env.underwater) {
         vec4 clouds = brClouds(s_BrCloudNoise, viewDir, env, skyCol, ViewPositionAndTime.w, gl_FragCoord.xy);

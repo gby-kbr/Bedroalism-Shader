@@ -13,6 +13,10 @@
 #define BR_SUN_TILT  0.0 // rotation of the sun texture (degrees)
 #define BR_MOON_TILT 0.0 // rotation of the moon texture (degrees)
 
+/* Sun/Moon glow in the sky */
+#define BR_SUN_GLOW  1.0 // 0.0 none ~ 2.0 strong
+#define BR_MOON_GLOW 1.0 // 0.0 none ~ 2.0 strong
+
 /* Exposure and gamma */
 #define BR_EXPOSURE 1.2 // 0.5 dark ~ 2.5 bright
 #define BR_GAMMA    2.2 // 1.8 bright ~ 2.6 dark
