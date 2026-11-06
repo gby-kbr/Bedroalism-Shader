@@ -5,6 +5,8 @@ $input v_clipPosition, v_color0, v_fog, v_light, v_texcoord0, v_worldPos
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 #include <bedroalism/config.h>
+#include <bedroalism/functions/detection.h>
+#include <bedroalism/functions/underwater.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 ColorBased;
@@ -20,6 +22,9 @@ uniform vec4 HudOpacity;
 uniform vec4 DitherParams;
 uniform vec4 DitherParams2[3];
 uniform vec4 DitheringEnabledToggle;
+uniform vec4 TimeOfDay;
+uniform vec4 FogColor;
+uniform vec4 FogAndDistanceControl;
 
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_MatTexture1);
@@ -65,7 +70,14 @@ void main() {
     }
 #endif
 
-    albedo.rgb = applyFog(albedo.rgb, v_fog.rgb, v_fog.a);
+    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+    if (env.underwater) {
+        // same clear water haze as the terrain
+        vec3 eyePos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+        albedo.rgb = brUnderwaterFog(albedo.rgb, length(v_worldPos - eyePos), env, 0.8);
+    } else {
+        albedo.rgb = applyFog(albedo.rgb, v_fog.rgb, v_fog.a);
+    }
     albedo.rgb = brColorCorrection(albedo.rgb);
     gl_FragColor = albedo;
 #endif

@@ -39,4 +39,15 @@ vec3 brSunMoonGlow(vec3 viewDir, brEnvironment env) {
   return (sunCol*sunAmount + vec3(0.55, 0.65, 0.90)*moonAmount)*clear;
 }
 
+// the sun and moon discs, for reflections and for looking up through the water surface
+// dir: normalized direction of the ray. radiance scales the brightness of each disc
+vec3 brSunMoonDisc(vec3 dir, brEnvironment env, float sunRadiance, float moonRadiance) {
+  float outer = 0.9983; // cos(0.058), the discs of the SunMoon material span about 0.058 rad at size 1.0
+  float inner = 0.9990; // cos(0.045), soft edge
+  vec3 sunCol = mix(vec3(1.15, 1.10, 1.00), vec3(1.50, 0.55, 0.25), env.twilight);
+  float sun = smoothstep(outer, inner, dot(dir, env.sunDir))*brGlowVisibility(env.sunDir.y);
+  float moon = smoothstep(outer, inner, dot(dir, env.moonDir))*brGlowVisibility(env.moonDir.y)*env.night;
+  return sunCol*(sun*sunRadiance) + vec3(0.62, 0.70, 0.90)*(moon*moonRadiance);
+}
+
 #endif

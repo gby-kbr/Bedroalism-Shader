@@ -17,6 +17,16 @@
 #define BR_SUN_GLOW  1.0 // 0.0 none ~ 2.0 strong
 #define BR_MOON_GLOW 1.0 // 0.0 none ~ 2.0 strong
 
+/* Water */
+#define BR_WATER_COLOR      vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
+#define BR_WATER_OPACITY    0.35 // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
+#define BR_WATER_WAVE_HEIGHT 1.0 // 0.0 flat ~ 2.0 rough, scales the slope and the height of the waves
+#define BR_WATER_WAVE_SPEED  0.8 // 0.0 still ~ 2.0 fast
+#define BR_WATER_WAVE_RANGE  48.0 // blocks around the camera where the surface mesh moves up and down
+#define BR_WATER_SUN_GLITTER 1.0 // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
+#define BR_WATER_CLOUD_REFLECTION 1.0 // 0.0 off (faster) ~ 1.0 clouds visible in the water
+#define BR_UNDERWATER_DENSITY 1.0 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
+
 /* Exposure and gamma */
 #define BR_EXPOSURE 1.2 // 0.5 dark ~ 2.5 bright
 #define BR_GAMMA    2.2 // 1.8 bright ~ 2.6 dark

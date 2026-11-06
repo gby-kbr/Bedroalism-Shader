@@ -1,9 +1,10 @@
-$input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_worldPos
+$input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_water, v_worldPos
 
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/lighting.h>
+#include <bedroalism/functions/underwater.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 FogColor;
@@ -12,9 +13,11 @@ uniform vec4 TimeOfDay;
 uniform vec4 DitherParams;
 uniform vec4 DitherParams2[3];
 uniform vec4 ViewPositionAndTime;
+uniform vec4 CameraPosition;
 
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_LightMapTexture);
+SAMPLER2D_AUTOREG(s_BrCloudNoise);
 #if defined(SEASONS)
 SAMPLER2D_AUTOREG(s_SeasonsTexture);
 #endif
@@ -71,9 +74,54 @@ void main() {
     }
 #endif
 
-    diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
-    diffuse.rgb *= brGetNightAmbient(v_lightmapUV, TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
-    diffuse.rgb = mix(diffuse.rgb, FogColor.rgb, v_fog.a);
+    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+    vec3 relPos = v_worldPos - ViewPositionAndTime.xyz; // from the camera to the fragment
+    float camDist = length(relPos);
+    vec3 viewDir = relPos/max(camDist, 0.0001);
+
+    bool isWater = false;
+#if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS))
+    // derivatives are taken outside the branch, they are only defined when all pixels of a block run them
+    vec3 geoNormal = normalize(cross(dFdx(v_worldPos), dFdy(v_worldPos)));
+    if (v_water.x > 0.5) {
+        isWater = true;
+        brSkyColor sky = brSkyColors(env);
+
+        // the top face gets the animated waves, the other faces use the normal of the geometry
+        bool top = v_water.y > 0.5;
+        vec3 nrm = geoNormal;
+        if (top) {
+            vec2 wavePos = brWaterCoord(relPos.xz, CameraPosition.xz);
+            nrm = brWaterNormal(wavePos, ViewPositionAndTime.w, camDist);
+        } else if (dot(nrm, viewDir) > 0.0) {
+            nrm = -nrm; // the winding of the face decides the sign, make it face the camera
+        }
+
+        vec4 water;
+        if (top && viewDir.y > 0.0) {
+            // the camera is under the surface: the sky through the water, bent by it. Where a roof covers
+            // the water the surface turns see-through so the roof stays visible
+            float skyVisible = smoothstep(0.55, 0.95, v_lightmapUV.y);
+            vec3 seen = brUnderwaterSurface(s_BrCloudNoise, viewDir, -nrm, env, sky, skyVisible, ViewPositionAndTime.w, gl_FragCoord.xy);
+            water = vec4(seen, mix(0.55, 1.0, skyVisible));
+        } else {
+            water = brWaterAbove(s_BrCloudNoise, viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky, ViewPositionAndTime.w, gl_FragCoord.xy);
+        }
+        diffuse = water;
+    }
+#endif
+
+    if (!isWater) {
+        diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
+        diffuse.rgb *= brGetNightAmbient(v_lightmapUV, TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+    }
+
+    if (env.underwater) {
+        // clear water haze instead of the thick vanilla fog
+        diffuse.rgb = brUnderwaterFog(diffuse.rgb, camDist, env, v_lightmapUV.y);
+    } else {
+        diffuse.rgb = mix(diffuse.rgb, FogColor.rgb, v_fog.a);
+    }
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;
