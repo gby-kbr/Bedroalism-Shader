@@ -50,6 +50,13 @@ brSkyColor brRainSkyColor(brSkyColor clear, float rainFactor) {
   return s;
 }
 
+// horizon color at and below the horizon, zenith color straight up
+// viewDir: normalized, y is up
+vec3 brSkyGradient(vec3 viewDir, brSkyColor sky) {
+  float elevation = clamp(viewDir.y, 0.0, 1.0);
+  return mix(sky.horizon, sky.zenith, pow(elevation, 0.45));
+}
+
 // day + night + sunrise + sunset = 1.0 (see detection.h)
 brSkyColor brSkyColors(brEnvironment env) {
   brSkyColor day = brDaySkyColor();

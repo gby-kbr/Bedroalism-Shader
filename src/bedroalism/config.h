@@ -38,4 +38,12 @@
 #define BR_SKY_RAIN_MIX_FACTOR 1.0 // 0.0 no change ~ 1.0 fully overcast when raining
 #define BR_SKY_AFTERGLOW       2.0 // 0.0 none ~ 4.0 strong, extra night sky brightness right after dusk
 
+/* Clouds */
+#define BR_CLOUD_COVERAGE   0.53  // 0.0 clear sky ~ 1.0 fully covered (rain adds to it)
+#define BR_CLOUD_SCALE      0.12  // 0.06 huge clouds ~ 0.30 small clouds
+#define BR_CLOUD_THICKNESS  0.6   // 0.2 flat ~ 1.2 tall and puffy
+#define BR_CLOUD_WIND_SPEED 0.001 // 0.0 still ~ 0.005 fast (texture units per second)
+#define BR_CLOUD_STEPS      6     // 4 faster, rougher ~ 8 slower, smoother (1 texture fetch per step)
+#define BR_CIRRUS           0.35  // 0.0 off ~ 0.8 strong, thin high streaks (1 texture fetch)
+
 #endif
