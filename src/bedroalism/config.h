@@ -17,6 +17,13 @@
 #define BR_SUN_GLOW  1.0 // 0.0 none ~ 2.0 strong
 #define BR_MOON_GLOW 1.0 // 0.0 none ~ 2.0 strong
 
+/* Torch light */
+#define BR_TORCH_INTENSITY 3.0 // 1.0 weak ~ 6.0 bright
+#define BR_TORCH_RADIUS    2.0 // blocks where the light has dropped to half, 1.0 tight ~ 4.0 wide
+#define BR_TORCH_FLICKER   0.12 // 0.0 steady ~ 0.4 strong flicker
+#define BR_TORCH_COLOR            vec3(1.00, 0.52, 0.18) // overworld, nether and end
+#define BR_UNDERWATER_TORCH_COLOR vec3(1.00, 0.60, 0.30) // before the water takes the red out of it
+
 /* Shadow */
 #define BR_SHADOW_STRENGTH   0.65 // 0.0 none ~ 1.0 black
 #define BR_SHADOW_SUN_FOLLOW 1.0  // 0.0 side shadows always on the same faces ~ 1.0 side shadows follow the sun and moon

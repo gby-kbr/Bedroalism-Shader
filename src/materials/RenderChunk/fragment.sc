@@ -6,6 +6,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/lighting.h>
 #include <bedroalism/functions/underwater.h>
 #include <bedroalism/functions/shadow.h>
+#include <bedroalism/functions/torch.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 FogColor;
@@ -116,8 +117,12 @@ void main() {
 #endif
 
     if (!isWater) {
-        diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
-        diffuse.rgb *= brGetNightAmbient(v_lightmapUV, TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+        // ambient light of the sky (the lightmap without block light) plus our own torch light
+        vec2 skyOnly = vec2(0.0, v_lightmapUV.y);
+        vec3 ambient = texture2D(s_LightMapTexture, skyOnly).rgb;
+        ambient *= brGetNightAmbient(skyOnly, TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+        vec3 torch = brTorchLight(v_lightmapUV.x, ambient, env, relPos.xz + CameraPosition.xz, ViewPositionAndTime.w);
+        diffuse.rgb *= ambient + torch;
         diffuse.rgb = brShadow(diffuse.rgb, v_lightmapUV, geoNormal, v_color0.g, env);
     }
 
