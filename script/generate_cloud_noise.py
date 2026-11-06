@@ -6,7 +6,7 @@ frequency (3, 6, 12 and 24 cycles per tile), so a single texture fetch returns 4
 Each octave is white noise low-pass filtered in frequency space with a gaussian. Filtering in frequency
 space makes the result periodic, so it tiles without a seam.
 
-Usage: python3 tools/generate_cloud_noise.py
+Usage: python3 script/generate_cloud_noise.py
 Needs: numpy, Pillow
 """
 import os
