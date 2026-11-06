@@ -8,6 +8,11 @@
 //   - the light of the block: sky light below the top of the range means a roof or an overhang, torch
 //     light takes the shadow away again (a lit cave wall is not dark)
 //   - the faces turned away from the light: this part follows the sun, and the moon at night
+// A shadow is the contrast with a lit place, so it only exists where there is light to be shut out:
+//   - outdoors, or just inside the edge of a roof. Deeper indoors and in caves the sky light is gone and so
+//     is the shadow (brOutdoor)
+//   - while the sun shines. At night the moon is too weak and in rain the light comes from the whole sky,
+//     the shadows almost disappear (brShadowVisibility)
 
 // shadow from the light level of the block
 // lightmapUV: x = block light, y = sky light, both 0.0 ~ 1.0
@@ -34,10 +39,23 @@ float brSideShadow(vec3 faceNormal, float vertexG, brEnvironment env) {
   return mix(fixedShadow, follow, amount);
 }
 
+// 1.0 where the sky is open or near, fades to 0.0 as the sky light runs out indoors
+float brOutdoor(float skyLight) {
+  return smoothstep(0.15, 0.50, skyLight);
+}
+
+// how visible the shadows are: full by day, weaker at sunrise and sunset, almost gone at night,
+// nearly gone in rain, none in the nether and the end
+float brShadowVisibility(brEnvironment env) {
+  float light = env.day + 0.60*env.twilight + 0.06*env.night;
+  return light*(1.0 - 0.90*env.rainFactor)*float(env.overworld);
+}
+
 // color of a block with its shadows
 vec3 brShadow(vec3 col, vec2 lightmapUV, vec3 faceNormal, float vertexG, brEnvironment env) {
-  col *= 1.0 - BR_SHADOW_STRENGTH*brLightmapShadow(lightmapUV);
-  col *= 1.0 - BR_SHADOW_STRENGTH*brSideShadow(faceNormal, vertexG, env);
+  float amount = BR_SHADOW_STRENGTH*brOutdoor(lightmapUV.y)*brShadowVisibility(env);
+  col *= 1.0 - amount*brLightmapShadow(lightmapUV);
+  col *= 1.0 - amount*brSideShadow(faceNormal, vertexG, env);
   return col;
 }
 
