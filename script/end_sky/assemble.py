@@ -35,7 +35,7 @@ res = np.zeros(ii.shape + (3,), np.float32); emit = np.zeros(ii.shape + (3,), np
 dd = dirs_at(0.5, 0.5)[core & ~inner]
 col, em, ring, p0, st = bh.trace(dd, bg2, noise)
 res[core & ~inner] = col; emit[core & ~inner] = em; log('bh outer')
-SS = 2
+SS = 3
 offs = [((a + 0.5)/SS, (b + 0.5)/SS) for a in range(SS) for b in range(SS)]
 for ox, oy in offs:
     dd = dirs_at(ox, oy)[inner]
@@ -57,7 +57,7 @@ near = np.exp(-(ang_bh/38.0)**2)
 above = (el > 0)
 limb = (np.array([0.20, 0.46, 0.95], np.float32)*(0.95*np.exp(-np.maximum(el, 0)/1.3))[..., None]
         + np.array([0.035, 0.085, 0.22], np.float32)*(np.exp(-np.maximum(el, 0)/8.0))[..., None])
-limb *= (1 + 2.6*near)[..., None]
+limb *= (1 + 3.5*near)[..., None]
 space_img = space_img + np.where(above[..., None], limb, 0)
 log('limb')
 

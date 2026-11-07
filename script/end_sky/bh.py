@@ -16,7 +16,7 @@ R0 = 24.0                      # observer radius: the shadow radius is about 12 
 INCL = np.radians(6.5)         # elevation of the observer above the disk plane
 ROLL = np.radians(17.0)        # tilt of the whole picture of the black hole in the sky (right side up)
 R_IN, R_OUT = 6.0, 11.5
-LENS_FADE = (15.0, 34.0)       # degrees from the centre: the bending of the far star field fades out smoothly (narrow lens)        # accretion disk from the innermost stable orbit outwards
+LENS_BACKGROUND = False        # True bends the star field around the black hole; False keeps the sky behind it undistorted        # accretion disk from the innermost stable orbit outwards
 DPHI, NSTEP = 0.0225, 440      # integration step and count, phi up to ~ 3 pi
 DISK_OPACITY = 0.86
 
@@ -29,7 +29,8 @@ def frame():
 
 def disk_emission(r, ang, noise_tile):
     """Brightness and colour of the disk at radius r and angle ang (position in the disk plane)."""
-    base = 7.5*(R_IN/r)**2.7*smoothstep(R_IN, R_IN*1.07, r)*(1 - smoothstep(0.80*R_OUT, R_OUT, r))
+    base = 6.0*(R_IN/r)**2.7*smoothstep(R_IN, R_IN*1.05, r)*(1 - smoothstep(0.78*R_OUT, R_OUT, r))
+    base = base*(1 + 1.4*np.exp(-(r - R_IN)/0.7))                      # hot inner edge
     # spiral streaks: noise in (angle + shear*log r, log r), periodic in the angle
     lr = np.log(r)
     n = noise_tile.shape[0]
@@ -37,11 +38,11 @@ def disk_emission(r, ang, noise_tile):
         u = ((ang + shear*lr)/(2*np.pi)*freq) % 1.0*n
         v = (lr*freq*0.55 + off) % 1.0*n
         return ndimage.map_coordinates(noise_tile, np.stack([v, u]), order=1, mode='grid-wrap')
-    streak = 0.7*tex(18, 2.6, 0.13) + 0.3*tex(52, 3.4, 0.61)
-    base = base*(0.35 + 1.5*streak)
+    streak = 0.55*tex(18, 2.6, 0.13) + 0.25*tex(52, 3.4, 0.61) + 0.20*tex(120, 4.0, 0.37)
+    base = base*(0.30 + 1.6*streak)
     t = np.clip((r - R_IN)/(R_OUT - R_IN), 0, 1)**0.55
-    white, blue = np.array([1.0, 1.0, 1.0]), np.array([0.40, 0.68, 1.0])
-    col = white*(1 - t)[..., None] + blue*t[..., None]
+    white, blue = np.array([1.0, 1.0, 1.0]), np.array([0.34, 0.62, 1.0])
+    col = white*(1 - t**0.8)[..., None] + blue*(t**0.8)[..., None]
     return base[..., None]*col
 
 def trace(dirs, bg, noise_tile):
@@ -135,7 +136,7 @@ def trace(dirs, bg, noise_tile):
         pf = phi_final[e]
         sd = -np.cos(pf)[:, None]*D0 + np.sin(pf)[:, None]*(np.cos(gam[e])[:, None]*right + np.sin(gam[e])[:, None]*up)
         # far from the shadow the bent direction is blended back to the straight one (one star image only)
-        wl = 1 - smoothstep(np.radians(LENS_FADE[0]), np.radians(LENS_FADE[1]), psi0[e])
+        wl = np.full(len(sd), 1.0 if LENS_BACKGROUND else 0.0)
         sd = sd*wl[:, None] + dirs[e]*(1 - wl)[:, None]
         sd /= np.linalg.norm(sd, axis=1)[:, None]
         out[e] = lookup(bg, sd)

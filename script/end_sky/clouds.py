@@ -18,7 +18,8 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
     L = np.array([np.cos(BH_EL)*np.sin(BH_AZ), np.sin(BH_EL), np.cos(BH_EL)*np.cos(BH_AZ)], np.float32)
     Lh, Ly = np.cos(BH_EL), np.sin(BH_EL)
     Lxz = L[[0, 2]]/np.linalg.norm(L[[0, 2]])
-    SHADOW_DIST = (0.035, 0.08, 0.15, 0.26, 0.42)
+    SHADOW_DIST = (0.04, 0.09, 0.16, 0.26, 0.40, 0.58, 0.80)
+    TH_SHADOW = 0.80                                        # thickness used for the shadow rays: long, soft shadows
     facing = np.clip(d @ L, 0, 1)                           # view toward the black hole
 
     rgb = np.zeros(d.shape, np.float32); T = np.ones(s.shape, np.float32)
@@ -58,23 +59,28 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
         a = np.where(below, a, 0)
         # shadow: march from this point toward the black hole; the ray climbs by Ly/Lh per unit of horizontal distance
         # and is blocked where the cloud height field is above it (soft, several distances)
-        climb = Ly/Lh/TH                                    # height fraction gained per unit of horizontal distance
+        climb = Ly/Lh/TH_SHADOW                                    # height fraction gained per unit of horizontal distance
         blocked = np.zeros(s.shape, np.float32)
         for sd_ in SHADOW_DIST:
             lowS, _ = height(xz + Lxz[:, None, None]*sd_, low_only=True)
-            Hs = np.clip((lowS - th)/k, 0, 1)**0.8
-            blocked = np.maximum(blocked, np.clip((Hs - (hf + sd_*climb))*3.2 + 0.15, 0, 1)*np.clip(Hs*3.0, 0, 1))
-        shadow = 1 - 0.92*blocked
+            Hs = 1.5*np.clip((lowS - th)/k, 0, 1)**0.8
+            blocked = np.maximum(blocked, np.clip((Hs - (hf + sd_*climb))*4.0 + 0.05, 0, 1)*np.clip(Hs*3.0, 0, 1))
+        # big cloud masses shadow their neighbours far away (low octave only, long distances)
+        for sd_ in (1.2, 2.4, 4.0):
+            lowB, _ = height(xz + Lxz[:, None, None]*sd_, low_only=True)
+            HB = np.clip((lowB - th)/k, 0, 1)**0.8
+            blocked = np.maximum(blocked, 0.8*np.clip((HB - (hf + sd_*climb*0.25))*3.0 + 0.05, 0, 1)*np.clip(HB*3.0, 0, 1))
+        shadow = 1 - 0.85*blocked
         lowN, _ = height(xz + Lxz[:, None, None]*0.045, low_only=True)
         HN = np.clip((lowN - th)/k, 0, 1)**0.8
-        slope = np.clip(0.62 + (Hc - HN)*4.2, 0.15, 1.5)    # surface facing the light is brighter
+        slope = np.clip(0.60 + (Hc - HN)*12.0, 0.05, 1.7)    # surface facing the light is brighter
         lit = shadow*slope
         top = hf**0.7
         amb = np.array([0.34, 0.45, 0.70], np.float32)*(0.55 + 0.45*top)[..., None]
         skyl = np.array([1.00, 0.94, 0.84], np.float32)*(0.18 + 0.82*top**1.6)[..., None]*(1 - 0.75*depthin)[..., None]
-        skyl = skyl*(0.42 + 0.58*shadow)[..., None]
-        bh = np.array([0.55, 0.78, 1.25], np.float32)*((0.42 + 2.4*facing**2.0)*lit*(0.30 + 0.70*top))[..., None]
-        col = (amb*0.62 + skyl*2.3 + bh)*(0.55 + 0.85*det)[..., None]
+        skyl = skyl*(0.12 + 0.88*shadow)[..., None]
+        bh = np.array([1.00, 1.15, 1.55], np.float32)*((0.85 + 2.4*facing**2.0)*lit*(0.35 + 0.65*top))[..., None]
+        col = (amb*1.25 + skyl*1.6 + bh*1.1)*(0.55 + 0.85*det)[..., None]
         rgb += col*(T*a)[..., None]
         T *= (1 - a)
 
@@ -85,6 +91,6 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
     w = (1 - np.exp(-0.022*dist_top))[..., None]
     col = col*(1 - w) + haze*w
     # the gaps show the dark, hazy air of the planet below
-    ground = np.array([0.020, 0.035, 0.075], np.float32)*(1 - w) + haze*0.55*w
+    ground = np.array([0.032, 0.056, 0.110], np.float32)*(1 - w) + haze*0.55*w
     full = col*alpha[..., None] + ground*(1 - alpha)[..., None]
     return np.where(below[..., None], full, 0).astype(np.float32), below.astype(np.float32)
