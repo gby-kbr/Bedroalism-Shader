@@ -119,7 +119,6 @@ vec4 brWaterAbove(sampler2D noiseTex, vec3 viewDir, vec3 nrm, vec2 lightmap, vec
   float luma = dot(biomeTint, vec3(0.333, 0.333, 0.333));
   vec3 tint = clamp(biomeTint/max(luma, 0.001), vec3(0.5, 0.5, 0.5), vec3(1.6, 1.6, 1.6));
   vec3 body = brWaterScatterColor(env, lightmap.y)*mix(vec3(1.0, 1.0, 1.0), tint, 0.35);
-  body += vec3(1.0, 0.55, 0.25)*(0.04*lightmap.x*lightmap.x); // torch light on the water
 
   // what reaches the eye = reflection*F + body*(1 - F)*(1 - transmit) + behind*(1 - F)*transmit
   float alpha = 1.0 - (1.0 - fresnel)*transmit;

@@ -112,6 +112,8 @@ void main() {
         } else {
             water = brWaterAbove(s_BrCloudNoise, viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky, ViewPositionAndTime.w, gl_FragCoord.xy);
         }
+        // torch light on the water, in the color of the dimension
+        water.rgb += 0.35*brTorchLight(v_lightmapUV.x, water.rgb, env, relPos.xz + CameraPosition.xz, ViewPositionAndTime.w);
         diffuse = water;
     }
 #endif

@@ -55,4 +55,16 @@ vec3 brTorchLight(float blockLight, vec3 ambient, brEnvironment env, vec2 pos, f
   return brTorchColor(env, blockLight)*(amount/(1.0 + lum));
 }
 
+// Entities and items do not get the block light of a face but one light color for the block they stand in
+// (TileLightColor). The game tints it warm where a torch is near, so the warm excess of red over blue
+// stands for the block light: an estimate, not the exact level. Where there is no torch the excess is 0.
+float brEntityTorchLevel(vec3 tileLight) {
+  return clamp((tileLight.r - tileLight.b)*1.7, 0.0, 1.0);
+}
+
+// the light of the sky inside that color: the warm tint of the torch is cut off at the blue level
+vec3 brEntityAmbient(vec3 tileLight) {
+  return min(tileLight, vec3(tileLight.b, tileLight.b, tileLight.b));
+}
+
 #endif
