@@ -13,9 +13,9 @@ from scipy import ndimage
 from common import *
 
 R0 = 24.0                      # observer radius: the shadow radius is about 12 degrees of the sky
-INCL = np.radians(6.5)         # elevation of the observer above the disk plane
-ROLL = np.radians(17.0)        # tilt of the whole picture of the black hole in the sky (right side up)
-R_IN, R_OUT = 6.0, 11.5
+INCL = np.radians(3.2)         # elevation of the observer above the disk plane
+ROLL = np.radians(0.0)         # tilt of the picture of the black hole: 0 keeps the disk plane horizontal (straight rings)
+R_IN, R_OUT = 6.0, 13.0
 LENS_BACKGROUND = False        # True bends the star field around the black hole; False keeps the sky behind it undistorted        # accretion disk from the innermost stable orbit outwards
 DPHI, NSTEP = 0.0225, 440      # integration step and count, phi up to ~ 3 pi
 DISK_OPACITY = 0.86
@@ -29,8 +29,8 @@ def frame():
 
 def disk_emission(r, ang, noise_tile):
     """Brightness and colour of the disk at radius r and angle ang (position in the disk plane)."""
-    base = 6.0*(R_IN/r)**2.7*smoothstep(R_IN, R_IN*1.05, r)*(1 - smoothstep(0.78*R_OUT, R_OUT, r))
-    base = base*(1 + 1.4*np.exp(-(r - R_IN)/0.7))                      # hot inner edge
+    base = 5.6*(R_IN/r)**2.1*smoothstep(R_IN, R_IN*1.05, r)*(1 - smoothstep(0.80*R_OUT, R_OUT, r))
+    base = base*(1 + 1.0*np.exp(-(r - R_IN)/0.7))                      # hot inner edge
     # spiral streaks: noise in (angle + shear*log r, log r), periodic in the angle
     lr = np.log(r)
     n = noise_tile.shape[0]
@@ -112,7 +112,7 @@ def trace(dirs, bg, noise_tile):
                 gam_l = 1/np.sqrt(1 - vk**2)
                 dopp = 1/(gam_l*(1 - vdotn))
                 gred = np.sqrt(1 - 2/rr)
-                E = disk_emission(rr, ang, noise_tile)*(dopp*gred)[:, None]**2.0
+                E = disk_emission(rr, ang, noise_tile)*(dopp*gred)[:, None]**1.0   # mild beaming: both wings stay visible
                 pid = act[ii]
                 emit[pid] += E*(T[pid]*DISK_OPACITY)[:, None]
                 T[pid] *= (1 - DISK_OPACITY)

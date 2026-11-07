@@ -8,9 +8,9 @@ import bh
 # (sigma in degrees, weight, tint): tight white core, then a blue halo that spreads over the sky and the cloud tops
 GLOW = ((0.35, 0.22, (1.00, 1.00, 1.00)),
         (1.2,  0.50, (0.86, 0.93, 1.00)),
-        (4.0,  1.30, (0.60, 0.78, 1.00)),
-        (11.0, 1.10, (0.40, 0.62, 1.00)),
-        (28.0, 0.70, (0.30, 0.50, 0.95)))
+        (4.0,  2.00, (0.60, 0.78, 1.00)),
+        (11.0, 0.95, (0.40, 0.62, 1.00)),
+        (28.0, 0.42, (0.30, 0.50, 0.95)))
 
 def blur_wrap(img, sx, sy):
     """Gaussian blur of an equirectangular layer, wrapping in longitude. Wide blurs run on a reduced copy."""

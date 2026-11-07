@@ -66,7 +66,7 @@ tL = tile_noise(512, 1.5, 1); tD = tile_noise(512, 1.3, 2)
 tiles = (mip_chain(tL, 8), mip_chain(tD, 8))
 out = space_img
 CH = 144
-for r0 in range(H//2, H, CH):
+for r0 in (range(H//2, H, CH) if not os.environ.get('NOCLOUDS') else []):
     r1 = min(r0 + CH, H)
     rgb, below = clouds.cloud_layer(W, H, (r0, r1), tiles)
     out[r0:r1] = np.where(below[..., None] > 0, rgb, out[r0:r1])
