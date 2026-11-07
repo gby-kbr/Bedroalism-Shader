@@ -16,7 +16,9 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
 
     # direction of the light from the black hole (horizontal part used for the shadow offset)
     L = np.array([np.cos(BH_EL)*np.sin(BH_AZ), np.sin(BH_EL), np.cos(BH_EL)*np.cos(BH_AZ)], np.float32)
+    Lh, Ly = np.cos(BH_EL), np.sin(BH_EL)
     Lxz = L[[0, 2]]/np.linalg.norm(L[[0, 2]])
+    SHADOW_DIST = (0.035, 0.08, 0.15, 0.26, 0.42)
     facing = np.clip(d @ L, 0, 1)                           # view toward the black hole
 
     rgb = np.zeros(d.shape, np.float32); T = np.ones(s.shape, np.float32)
@@ -26,7 +28,7 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
     dist_top = A/s
 
     c37, s37 = np.cos(0.65), np.sin(0.65)
-    def height(xz, lod_shift=0.0):
+    def height(xz, lod_shift=0.0, low_only=False):
         # lumps from three scales of the low octave tile (rotated and offset so the tile does not repeat),
         # billows from the detail tile. scale: texels per unit
         fp = dist_top*dpx/s                                # footprint on the cloud plane (units)
@@ -37,6 +39,7 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
         l2 = sample_tile(chainL, xr*28.0 + 200.0, zr*28.0 + 90.0, lod(28.0))
         l3 = sample_tile(chainL, x*70.0 - 310.0, z*70.0 + 40.0, lod(70.0))
         low = 0.40*l1 + 0.35*l2 + 0.25*l3
+        if low_only: return low, None
         det = sample_tile(chainD, xr*160.0 + 123.0, zr*160.0 - 77.0, lod(160.0))
         return low, det
 
@@ -53,15 +56,25 @@ def cloud_layer(W, H, rows, tiles, quality=1.0):
         ds = (TH/steps)/s
         a = occ*(1 - np.exp(-ds*7.0))
         a = np.where(below, a, 0)
-        # shadow: is the neighbour toward the light taller than this point
-        lowS, _ = height(xz + Lxz[:, None, None]*0.07)
-        Hs = np.clip((lowS - th)/k, 0, 1)**0.8
-        shadow = np.clip(1 - (Hs - hf)*2.6, 0.08, 1)
+        # shadow: march from this point toward the black hole; the ray climbs by Ly/Lh per unit of horizontal distance
+        # and is blocked where the cloud height field is above it (soft, several distances)
+        climb = Ly/Lh/TH                                    # height fraction gained per unit of horizontal distance
+        blocked = np.zeros(s.shape, np.float32)
+        for sd_ in SHADOW_DIST:
+            lowS, _ = height(xz + Lxz[:, None, None]*sd_, low_only=True)
+            Hs = np.clip((lowS - th)/k, 0, 1)**0.8
+            blocked = np.maximum(blocked, np.clip((Hs - (hf + sd_*climb))*3.2 + 0.15, 0, 1)*np.clip(Hs*3.0, 0, 1))
+        shadow = 1 - 0.92*blocked
+        lowN, _ = height(xz + Lxz[:, None, None]*0.045, low_only=True)
+        HN = np.clip((lowN - th)/k, 0, 1)**0.8
+        slope = np.clip(0.62 + (Hc - HN)*4.2, 0.15, 1.5)    # surface facing the light is brighter
+        lit = shadow*slope
         top = hf**0.7
         amb = np.array([0.34, 0.45, 0.70], np.float32)*(0.55 + 0.45*top)[..., None]
         skyl = np.array([1.00, 0.94, 0.84], np.float32)*(0.18 + 0.82*top**1.6)[..., None]*(1 - 0.75*depthin)[..., None]
-        bh = np.array([0.55, 0.78, 1.25], np.float32)*((0.10 + 2.4*facing**2.0)*shadow*(0.30 + 0.70*top))[..., None]
-        col = (amb*0.70 + skyl*2.7 + bh)*(0.55 + 0.85*det)[..., None]
+        skyl = skyl*(0.42 + 0.58*shadow)[..., None]
+        bh = np.array([0.55, 0.78, 1.25], np.float32)*((0.42 + 2.4*facing**2.0)*lit*(0.30 + 0.70*top))[..., None]
+        col = (amb*0.62 + skyl*2.3 + bh)*(0.55 + 0.85*det)[..., None]
         rgb += col*(T*a)[..., None]
         T *= (1 - a)
 

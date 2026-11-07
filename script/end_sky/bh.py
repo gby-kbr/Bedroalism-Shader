@@ -12,9 +12,11 @@ import numpy as np
 from scipy import ndimage
 from common import *
 
-R0 = 18.0                      # observer radius: the shadow covers about 17 degrees of the sky
-INCL = np.radians(4.5)         # elevation of the observer above the disk plane
-R_IN, R_OUT = 6.0, 14.0        # accretion disk from the innermost stable orbit outwards
+R0 = 24.0                      # observer radius: the shadow radius is about 12 degrees of the sky
+INCL = np.radians(6.5)         # elevation of the observer above the disk plane
+ROLL = np.radians(17.0)        # tilt of the whole picture of the black hole in the sky (right side up)
+R_IN, R_OUT = 6.0, 11.5
+LENS_FADE = (15.0, 34.0)       # degrees from the centre: the bending of the far star field fades out smoothly (narrow lens)        # accretion disk from the innermost stable orbit outwards
 DPHI, NSTEP = 0.0225, 440      # integration step and count, phi up to ~ 3 pi
 DISK_OPACITY = 0.86
 
@@ -22,7 +24,8 @@ def frame():
     D0 = np.array([np.cos(BH_EL)*np.sin(BH_AZ), np.sin(BH_EL), np.cos(BH_EL)*np.cos(BH_AZ)], np.float64)
     right = np.cross([0, 1, 0], D0); right /= np.linalg.norm(right)
     up = np.cross(D0, right)
-    return D0, right, up
+    cr, sr = np.cos(ROLL), np.sin(ROLL)
+    return D0, cr*right + sr*up, -sr*right + cr*up
 
 def disk_emission(r, ang, noise_tile):
     """Brightness and colour of the disk at radius r and angle ang (position in the disk plane)."""
@@ -131,6 +134,10 @@ def trace(dirs, bg, noise_tile):
     if e.any():
         pf = phi_final[e]
         sd = -np.cos(pf)[:, None]*D0 + np.sin(pf)[:, None]*(np.cos(gam[e])[:, None]*right + np.sin(gam[e])[:, None]*up)
+        # far from the shadow the bent direction is blended back to the straight one (one star image only)
+        wl = 1 - smoothstep(np.radians(LENS_FADE[0]), np.radians(LENS_FADE[1]), psi0[e])
+        sd = sd*wl[:, None] + dirs[e]*(1 - wl)[:, None]
+        sd /= np.linalg.norm(sd, axis=1)[:, None]
         out[e] = lookup(bg, sd)
     out = out*T[:, None]
     # mix back to straight lookup for rays looking away (psi0 > 90): they were not integrated

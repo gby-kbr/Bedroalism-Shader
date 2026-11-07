@@ -3,7 +3,7 @@ import numpy as np
 from scipy import ndimage
 
 BH_AZ = np.radians(-72.0)    # azimuth of the black hole, reference: 30% from the left edge
-BH_EL = np.radians(11.5)     # elevation of its centre
+BH_EL = np.radians(27.0)     # elevation of its centre: the whole black hole stays above the horizon
 
 def grid(W, H, rows=None):
     """Directions of the pixel centres. x east, y up, z north, longitude 0 = +z. Shape (rows, W, 3)."""

@@ -19,8 +19,8 @@ bg = bg2.reshape(H, 2, W, 2, 3).mean((1, 3)).astype(np.float32); log('space')
 # 2. black hole window: every pixel within 60 degrees of the black hole is traced
 noise = tile_noise(512, 1.2, 9)
 az0, el0 = np.degrees(BH_AZ), np.degrees(BH_EL)
-i0 = int(((az0 - 64)/360 + 0.5)*W); i1 = int(((az0 + 64)/360 + 0.5)*W)
-j0 = int((0.5 - (el0 + 62)/180)*H); j1 = int((0.5 - (el0 - 60)/180)*H)
+i0 = int(((az0 - 62)/360 + 0.5)*W); i1 = int(((az0 + 62)/360 + 0.5)*W)
+j0 = int((0.5 - (el0 + 52)/180)*H); j1 = int((0.5 - (el0 - 52)/180)*H)
 ii, jj = np.meshgrid(np.arange(i0, i1), np.arange(j0, j1))
 def dirs_at(ox, oy):
     lon = ((ii + ox)/W - 0.5)*2*np.pi; lat = (0.5 - (jj + oy)/H)*np.pi
@@ -28,8 +28,8 @@ def dirs_at(ox, oy):
 D0, right, up = bh.frame()
 d0 = dirs_at(0.5, 0.5)
 psi = np.degrees(np.arccos(np.clip(d0 @ D0, -1, 1)))
-core = psi < 60.0
-inner = psi < 34.0
+core = psi < 50.0
+inner = psi < 30.0
 res = np.zeros(ii.shape + (3,), np.float32); emit = np.zeros(ii.shape + (3,), np.float32)
 # outer ring: one sample per pixel, inner part: 2 x 2 samples
 dd = dirs_at(0.5, 0.5)[core & ~inner]
@@ -42,7 +42,7 @@ for ox, oy in offs:
     col, em, ring, p0, st = bh.trace(dd, bg2, noise)
     res[inner] += (col/len(offs)).astype(np.float32); emit[inner] += (em/len(offs)).astype(np.float32)
     log(f'bh inner sample {ox:.2f},{oy:.2f}')
-wblend = (1 - smoothstep(50.0, 60.0, psi))[..., None].astype(np.float32)
+wblend = (1 - smoothstep(40.0, 50.0, psi))[..., None].astype(np.float32)
 win = bg[j0:j1, i0:i1]
 space_img = bg.copy()
 space_img[j0:j1, i0:i1] = win*(1 - wblend) + np.where(core[..., None], res, win)*wblend
