@@ -13,13 +13,14 @@
 // grazing angles (Fresnel), so the puddles reflect the overcast sky and the drops that hit them leave rings.
 // ---------------------------------------------------------------------------------------------
 
-// 0.0 dry ~ 1.0 water. p: world position (x, z) in blocks. cover: 0.0 nothing is wet ~ 1.0 most of the ground
+// 0.0 dry ~ 1.0 water. p: world position (x, z) in blocks. cover: 0.0 nothing is wet ~ 1.0 the whole ground
+// is covered, only the thickness of the film still varies a little
 float brPuddleMask(sampler2D noiseTex, vec2 p, float cover) {
   vec4 a = texture2DLod(noiseTex, p*(1.0/52.0), 0.0);
   vec4 b = texture2DLod(noiseTex, p*(1.0/13.0) + vec2(0.37, 0.61), 0.0);
   float n = 0.50*a.r + 0.25*a.g + 0.15*b.r + 0.10*b.g;
-  float t = mix(0.82, 0.38, clamp(cover, 0.0, 1.5));
-  return smoothstep(t, t + 0.06, n);
+  float t = mix(0.82, -0.08, clamp(cover, 0.0, 1.0));
+  return smoothstep(t, t + 0.06, n)*mix(0.80, 1.0, n);
 }
 
 // slope (x, z) of the water surface made by the rings of the drops. Every cell of the grid gets a drop

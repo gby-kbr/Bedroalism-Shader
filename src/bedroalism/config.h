@@ -50,7 +50,7 @@
 #define BR_SNOW_OPACITY  0.85 // 0.2 faint ~ 1.0 opaque
 #define BR_SNOW_SIZE     1.0  // 0.5 fine ~ 2.0 large flakes
 #define BR_WET_DARKEN    0.35 // 0.0 no change ~ 0.6 dark, how much wet ground darkens in rain
-#define BR_PUDDLES       1.0  // 0.0 none ~ 1.5 almost every flat surface is covered by a thin puddle
+#define BR_PUDDLES       1.0  // 0.0 none ~ 1.0 every flat surface under the open sky is covered by a thin film of water (less: patchy)
 #define BR_PUDDLE_RIPPLES 1.0 // 0.0 still ~ 2.0 strong, rings of the drops hitting the puddles
 
 /* Exposure and gamma */
