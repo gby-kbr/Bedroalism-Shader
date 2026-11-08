@@ -9,6 +9,7 @@ $output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/water.h>
+#include <bedroalism/functions/wave.h>
 
 uniform vec4 RenderChunkFogAlpha;
 uniform vec4 FogAndDistanceControl;
@@ -16,6 +17,8 @@ uniform vec4 ViewPositionAndTime;
 uniform vec4 FogColor;
 uniform vec4 MeshContext;
 uniform vec4 CameraPosition;
+
+SAMPLER2D_AUTOREG(s_MatTexture);
 
 void main() {
 #ifdef INSTANCING
@@ -68,6 +71,22 @@ void main() {
                 vec2 wavePos = brWaterCoord(worldPos.xz - ViewPositionAndTime.xz, CameraPosition.xz);
                 worldPos.y += brWaterDisplacement(wavePos, ViewPositionAndTime.w, waterDist);
             }
+        }
+    }
+#endif
+
+    // plants, leaves, vines and hanging lanterns move in the wind
+#if defined(ALPHA_TEST) && !defined(RENDER_AS_BILLBOARDS) && !defined(INSTANCING)
+    {
+        vec3 relPos = worldPos - ViewPositionAndTime.xyz;
+        float waveDist = length(relPos);
+        if (waveDist < BR_WAVE_RANGE) {
+#ifdef SEASONS
+            bool seasons = true;
+#else
+            bool seasons = false;
+#endif
+            worldPos = brWaveVertex(worldPos, a_position, relPos + CameraPosition.xyz, color, uv0, lightmapUV, float(textureSize(s_MatTexture, 0).y), waveDist, brDetectRain(FogAndDistanceControl.xyz), ViewPositionAndTime.w, seasons);
         }
     }
 #endif

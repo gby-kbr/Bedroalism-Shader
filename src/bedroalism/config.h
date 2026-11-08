@@ -54,6 +54,13 @@
 #define BR_PUDDLES       1.0  // 0.0 none ~ 1.0 every flat surface under the open sky is covered by a thin film of water (less: patchy)
 #define BR_PUDDLE_RIPPLES 1.0 // 0.0 still ~ 2.0 strong, rings of the drops hitting the puddles
 
+/* Waving of plants, leaves and hanging things */
+#define BR_WAVE_PLANTS  0.10 // 0.03 gentle ~ 0.30 violent, how far the tips of grass and crops bend in blocks
+#define BR_WAVE_LEAVES  0.04 // 0.0 still ~ 0.12 strong, how far leaves and vines move in blocks
+#define BR_WAVE_LANTERN 0.14 // 0.04 subtle ~ 0.35 large swing, angle of the swing of lanterns in radians
+#define BR_WAVE_SPEED   1.0  // 0.3 slow ~ 2.5 fast, speed of the wind and of everything it moves
+#define BR_WAVE_RANGE   28.0 // 12.0 ~ 64.0 blocks around the camera where things wave (the wave fades out before it)
+
 /* Fog (overworld only, the Nether and the End keep their own) */
 #define BR_FOG_DENSITY 0.0065 // 0.0015 thin haze ~ 0.012 thick, light lost per block at sea level on a clear day
 #define BR_FOG_RAIN    2.0    // 0.0 none ~ 5.0 dense, extra fog while it rains (multiplies the density by 1 + this at full rain)
