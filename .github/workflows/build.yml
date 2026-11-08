@@ -1,16 +1,11 @@
 name: Build
 
 # Compiles the materials for Android, iOS and Windows (one multiplatform pack) and publishes the pack
-# as a .mcpack file. The file is uploaded as it is, not wrapped in a .zip.
+# as a .mcpack file. The file is uploaded as it is, not wrapped in a .zip. The pack is the content of the
+# mcpack folder with its own manifest.json: change the version there by hand.
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Patch number of the pack version (eg: 3 gives 0.1.3). Empty keeps the version of mcpack/manifest.json'
-        required: false
-        default: ''
-        type: string
 
 permissions:
   contents: read
@@ -39,15 +34,7 @@ jobs:
         run: .\build.bat setup
 
       - name: Build pack
-        shell: pwsh
-        run: |
-          $version = '${{ inputs.version }}'
-          if ($version) {
-            .\build.bat pack -p multiplatform -v $version
-          } else {
-            .\build.bat pack -p multiplatform
-          }
-          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+        run: .\build.bat pack -p multiplatform
 
       - name: Upload pack
         uses: actions/upload-artifact@v7

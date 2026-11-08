@@ -24,7 +24,6 @@ def main():
     mats_cmd.set_defaults(func=build.run)
 
     pack_cmd = commands.add_parser("pack", help="compile the materials and build the .mcpack")
-    pack_cmd.add_argument("-v", default="", help="patch number of the version, eg: 3 gives 0.1.3")
     pack_cmd.add_argument("--no-archive", action="store_true", help="leave the pack as a folder")
     pack_cmd.set_defaults(func=pack.run)
 

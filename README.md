@@ -32,7 +32,10 @@ pip install -r requirements.txt
 |---|---|
 | `setup` | downloads shaderc and the vanilla material definitions into `tool/data` (`--reset` starts over) |
 | `mats` | compiles the materials into `build/<profile>`. `-m Sky RenderChunk` compiles only those |
-| `pack` | compiles into a copy of `mcpack` and writes `build/Bedroalism-Shader-<version>-<profile>.mcpack`. `-v 3` sets the patch of the version, `--no-archive` keeps the folder |
+| `pack` | compiles into a copy of `mcpack` and writes `build/Bedroalism-Shader-<version>-<profile>.mcpack`. `--no-archive` keeps the folder |
+
+`mcpack/manifest.json` is copied as it is: the build never creates or changes a manifest. The version of the pack,
+and the number in the file name, is the one written there by hand.
 
 Profiles (`-p`): `multiplatform` (Android, iOS and Windows in one pack), `android`, `ios`, `windows`.
 Direct3D shaders (Windows) can only be compiled on Windows, so `multiplatform` and `windows` need a Windows machine.
@@ -45,7 +48,7 @@ the dev release of Newb Shader.
 
 | Workflow | Does |
 |---|---|
-| **Build** | Manual. Compiles the multiplatform pack and uploads the `.mcpack` as it is, not wrapped in a `.zip`. The input sets the patch number of the version |
+| **Build** | Manual. Compiles the multiplatform pack and uploads the `.mcpack` as it is, not wrapped in a `.zip`. The version is the one of `mcpack/manifest.json` |
 | **Build-Check** | On pull requests and on pushes to `main` that change shader code, and manually. Runs the same compilation and stops at the first error or warning. Makes no file |
 | **Import-Tools** | Manual, run once. Copies shaderc and the material definitions from Newb Shader to the `build-tools` release of this repository |
 

@@ -25,12 +25,6 @@ BASE_MATERIALS_ZIP = "src-materials-1.26.60.zip"
 SHADERC_PREFIX = "shaderc-"
 
 PROFILES = ("multiplatform", "android", "ios", "windows")
-LOADERS = {
-    "android": "MB Loader",
-    "ios": "Minecraft with Hynis",
-    "windows": "Wyvern Loader",
-    "multiplatform": "MB Loader (Android), Wyvern Loader (Windows) or Minecraft with Hynis (iOS)",
-}
 
 
 def default_profile():
