@@ -1,7 +1,11 @@
 {
   "base_profile": {
-    "platforms": ["ESSL_310"],
-    "merge_source": ["../tools/materials"],
+    "platforms": [
+      "ESSL_300"
+    ],
+    "merge_source": [
+      "../../tool/data/materials"
+    ],
     "include_patterns": [
       "Actor",
       "Clouds",
@@ -12,13 +16,41 @@
       "SunMoon",
       "Weather"
     ],
-    "exclude_patterns": [".*", "_*"],
-    "include_search_paths": ["../include", "../../src", "../../include"]
+    "exclude_patterns": [
+      ".*",
+      "_*"
+    ],
+    "include_search_paths": [
+      "../../src",
+      "../../include"
+    ]
   },
   "profiles": {
+    "android": {
+      "macros": [],
+      "platforms": [
+        "ESSL_300"
+      ]
+    },
+    "ios": {
+      "macros": [],
+      "platforms": [
+        "Metal"
+      ]
+    },
+    "windows": {
+      "macros": [],
+      "platforms": [
+        "Direct3D_SM50"
+      ]
+    },
     "multiplatform": {
       "macros": [],
-      "platforms": ["ESSL_310", "Direct3D_SM50", "Metal"]
+      "platforms": [
+        "ESSL_300",
+        "Direct3D_SM50",
+        "Metal"
+      ]
     }
   }
 }
