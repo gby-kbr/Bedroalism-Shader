@@ -9,6 +9,7 @@ $input v_clipPosition, v_color0, v_dirLight, v_fog, v_light, v_texcoord0, v_worl
 #include <bedroalism/functions/underwater.h>
 #include <bedroalism/functions/torch.h>
 #include <bedroalism/functions/colorcorrection.h>
+#include <bedroalism/functions/fog.h>
 
 uniform vec4 ColorBased;
 uniform vec4 ChangeColor;
@@ -83,7 +84,7 @@ void main() {
         // same clear water haze as the terrain
         albedo.rgb = brUnderwaterFog(albedo.rgb, length(v_worldPos - eyePos), env, 0.8);
     } else {
-        albedo.rgb = applyFog(albedo.rgb, v_fog.rgb, v_fog.a);
+        albedo.rgb = brApplyFog(albedo.rgb, v_worldPos - eyePos, CameraPosition.y, 1.0, env, v_fog.rgb, v_fog.a);
     }
     albedo.rgb = brColorCorrection(albedo.rgb);
     gl_FragColor = albedo;

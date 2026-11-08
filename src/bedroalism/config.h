@@ -53,6 +53,13 @@
 #define BR_PUDDLES       1.0  // 0.0 none ~ 1.0 every flat surface under the open sky is covered by a thin film of water (less: patchy)
 #define BR_PUDDLE_RIPPLES 1.0 // 0.0 still ~ 2.0 strong, rings of the drops hitting the puddles
 
+/* Fog (overworld only, the Nether and the End keep their own) */
+#define BR_FOG_DENSITY 0.0065 // 0.0015 thin haze ~ 0.012 thick, light lost per block at sea level on a clear day
+#define BR_FOG_RAIN    2.0    // 0.0 none ~ 5.0 dense, extra fog while it rains (multiplies the density by 1 + this at full rain)
+#define BR_FOG_MORNING 1.5    // 0.0 none ~ 4.0 dense, extra mist at sunrise
+#define BR_FOG_FALLOFF 0.020  // 0.008 deep fog layer ~ 0.05 thin ground mist, how fast the fog thins out with height
+#define BR_FOG_GLOW    0.30   // 0.0 none ~ 1.0 strong, glow of the sun and moon in the fog
+
 /* Exposure and gamma */
 #define BR_EXPOSURE 1.2 // 0.5 dark ~ 2.5 bright
 #define BR_GAMMA    2.2 // 1.8 bright ~ 2.6 dark

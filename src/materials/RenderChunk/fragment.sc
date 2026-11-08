@@ -8,6 +8,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/shadow.h>
 #include <bedroalism/functions/torch.h>
 #include <bedroalism/functions/rain.h>
+#include <bedroalism/functions/fog.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 FogColor;
@@ -138,7 +139,7 @@ void main() {
         // clear water haze instead of the thick vanilla fog
         diffuse.rgb = brUnderwaterFog(diffuse.rgb, camDist, env, v_lightmapUV.y);
     } else {
-        diffuse.rgb = mix(diffuse.rgb, FogColor.rgb, v_fog.a);
+        diffuse.rgb = brApplyFog(diffuse.rgb, relPos, CameraPosition.y, v_lightmapUV.y, env, FogColor.rgb, v_fog.a);
     }
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);
