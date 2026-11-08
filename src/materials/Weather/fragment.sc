@@ -2,11 +2,8 @@ $input v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldPo
 
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
-#include <bedroalism/config.h>
-#include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 OcclusionHeightOffset;
-uniform vec4 UVOffsetAndScale;
 
 SAMPLER2D_AUTOREG(s_WeatherTexture);
 SAMPLER2D_AUTOREG(s_OcclusionTexture);
@@ -51,10 +48,5 @@ void main() {
         diffuse.rgb *= light;
         diffuse.rgb = applyFog(diffuse.rgb, v_fog.rgb, v_fog.a);
     }
-    // thinner and fainter than vanilla: rain is the tall sprite row, snow the square one. The texture has no
-    // speck sprite, the drops are only thin streaks
-    bool isRain = UVOffsetAndScale.w > 2.5*UVOffsetAndScale.z;
-    diffuse.a *= isRain ? BR_RAIN_OPACITY : BR_SNOW_OPACITY;
-    diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;
 }

@@ -67,9 +67,6 @@ vcpkg_installed/
 Testing/
 .cache/
 
-# Build tool
-tool/data/
-tool/lib/
 __pycache__/
 *.py[cod]
 *.mcpack

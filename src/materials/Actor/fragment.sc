@@ -1,15 +1,9 @@
-$input v_clipPosition, v_color0, v_dirLight, v_fog, v_light, v_texcoord0, v_worldPos
+$input v_clipPosition, v_color0, v_fog, v_light, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/ActorUtil.dragonh>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
-#include <bedroalism/config.h>
-#include <bedroalism/functions/detection.h>
-#include <bedroalism/functions/underwater.h>
-#include <bedroalism/functions/torch.h>
-#include <bedroalism/functions/colorcorrection.h>
-#include <bedroalism/functions/fog.h>
 
 uniform vec4 ColorBased;
 uniform vec4 ChangeColor;
@@ -24,11 +18,6 @@ uniform vec4 HudOpacity;
 uniform vec4 DitherParams;
 uniform vec4 DitherParams2[3];
 uniform vec4 DitheringEnabledToggle;
-uniform vec4 TimeOfDay;
-uniform vec4 FogColor;
-uniform vec4 FogAndDistanceControl;
-uniform vec4 CameraPosition;
-uniform vec4 ViewPositionAndTime;
 
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_MatTexture1);
@@ -65,13 +54,7 @@ void main() {
     albedo.a = max(UseAlphaRewrite.x, albedo.a);
 #endif
 
-    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
-    vec3 eyePos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-
-    // the light of the sky shaded by the direction of the face, plus our own torch light
-    vec3 ambient = brEntityAmbient(TileLightColor.rgb)*v_dirLight;
-    vec3 torch = brTorchLight(brEntityTorchLevel(TileLightColor.rgb), ambient, env, v_worldPos.xz - eyePos.xz + CameraPosition.xz, ViewPositionAndTime.w);
-    albedo = applyActorDiffuse(albedo, v_color0.rgb, vec4(ambient + torch, 1.0), ColorBased.x, OverlayColor);
+    albedo = applyActorDiffuse(albedo, v_color0.rgb, v_light, ColorBased.x, OverlayColor);
 
 #if defined(TRANSPARENT)
     albedo = applyHudOpacity(albedo, HudOpacity.x);
@@ -80,13 +63,7 @@ void main() {
     }
 #endif
 
-    if (env.underwater) {
-        // same clear water haze as the terrain
-        albedo.rgb = brUnderwaterFog(albedo.rgb, length(v_worldPos - eyePos), env, 0.8);
-    } else {
-        albedo.rgb = brApplyFog(albedo.rgb, v_worldPos - eyePos, CameraPosition.y, 1.0, FogAndDistanceControl.z, env, v_fog.rgb, v_fog.a);
-    }
-    albedo.rgb = brColorCorrection(albedo.rgb);
+    albedo.rgb = applyFog(albedo.rgb, v_fog.rgb, v_fog.a);
     gl_FragColor = albedo;
 #endif
 }

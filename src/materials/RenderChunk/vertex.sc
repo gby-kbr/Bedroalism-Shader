@@ -3,23 +3,16 @@ $input a_color0, a_position, a_texcoord0, a_texcoord1
     $input i_data1, i_data2, i_data3
 #endif
 
-$output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_water, v_worldPos, v_worldPosition
+$output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_worldPos, v_worldPosition
 
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
-#include <bedroalism/config.h>
-#include <bedroalism/functions/water.h>
-#include <bedroalism/functions/wave.h>
-#include <bedroalism/functions/lava.h>
 
 uniform vec4 RenderChunkFogAlpha;
 uniform vec4 FogAndDistanceControl;
 uniform vec4 ViewPositionAndTime;
 uniform vec4 FogColor;
 uniform vec4 MeshContext;
-uniform vec4 CameraPosition;
-
-SAMPLER2D_AUTOREG(s_MatTexture);
 
 void main() {
 #ifdef INSTANCING
@@ -59,48 +52,6 @@ void main() {
     float ditherY = float((uv1_16.y & 256u) != 0u ? 1.0 : 0.0);
     vec2 ditheringAndMaskTinting = vec2(ditherX, ditherY);
 
-    // water: the transparent faces with a blue tint and a see-through alpha, top faces are the ones that
-    // do not sit on a block boundary (a water surface is lower than the full block)
-    vec2 water = vec2(0.0, 0.0);
-#if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS)) && !defined(INSTANCING)
-    if (a_color0.b > 0.3 && a_color0.a < 0.95) {
-        water.x = 1.0;
-        if (fract(a_position.y) > 0.0) {
-            water.y = 1.0;
-            float waterDist = length(ViewPositionAndTime.xyz - worldPos);
-            if (waterDist < BR_WATER_WAVE_RANGE) {
-                vec2 wavePos = brWaterCoord(worldPos.xz - ViewPositionAndTime.xz, CameraPosition.xz);
-                worldPos.y += brWaterDisplacement(wavePos, ViewPositionAndTime.w, waterDist);
-            }
-        }
-    }
-#endif
-
-    // lava: the top face of a lava block swells slowly, the pattern of the surface is made in the fragment
-#if !defined(ALPHA_TEST) && !defined(RENDER_AS_BILLBOARDS) && !defined(INSTANCING)
-    if (brIsLavaTop(a_color0, fract(a_position), lightmapUV, uv0)) {
-        water.x = -1.0;
-        vec3 lavaRel = worldPos - ViewPositionAndTime.xyz;
-        worldPos.y += brLavaSwell(lavaRel.xz + CameraPosition.xz, ViewPositionAndTime.w);
-    }
-#endif
-
-    // plants, leaves, vines and hanging lanterns move in the wind
-#if defined(ALPHA_TEST) && !defined(RENDER_AS_BILLBOARDS) && !defined(INSTANCING)
-    {
-        vec3 relPos = worldPos - ViewPositionAndTime.xyz;
-        float waveDist = length(relPos);
-        if (waveDist < BR_WAVE_RANGE) {
-#ifdef SEASONS
-            bool seasons = true;
-#else
-            bool seasons = false;
-#endif
-            worldPos = brWaveVertex(worldPos, a_position, relPos + CameraPosition.xyz, color, uv0, lightmapUV, float(textureSize(s_MatTexture, 0).y), waveDist, brDetectRain(FogAndDistanceControl.xyz), ViewPositionAndTime.w, seasons);
-        }
-    }
-#endif
-
     vec4 position = jitterVertexPosition(worldPos);
 
     float camDist = length(ViewPositionAndTime.xyz - worldPos);
@@ -120,7 +71,6 @@ void main() {
     v_fog = fog;
     v_lightmapUV = lightmapUV;
     v_texcoord0 = uv0;
-    v_water = water;
     v_worldPos = worldPos;
     gl_Position = position;
 }

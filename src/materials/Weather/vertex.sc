@@ -8,8 +8,6 @@ $output v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldP
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
-#include <bedroalism/config.h>
-#include <bedroalism/functions/utils.h>
 
 uniform vec4 Dimensions;
 uniform vec4 FogAndDistanceControl;
@@ -42,28 +40,8 @@ void main() {
     worldSpacePosition -= particleBox * 0.5;
     worldSpacePosition += PositionForwardOffset.xyz;
 
-    // rain is the tall sprite row of the texture, snow the square one
-    bool isRain = UVOffsetAndScale.w > 2.5*UVOffsetAndScale.z;
-    float drop = brHash13(a_position);              // fixed per particle: decides if it is kept and how it drifts
-    vec3 velocity = Velocity.xyz;
-    vec2 size = Dimensions.xy;
-    bool keep = true;
-    if (isRain) {
-        // fewer and thinner drops than vanilla; the wind leans the whole shower, drops and field together
-        keep = drop < BR_RAIN_DENSITY;
-        size.x *= BR_RAIN_WIDTH;
-        float lean = 0.12*BR_RAIN_SLANT;
-        velocity.x = velocity.y*lean;
-        worldSpacePosition.x += worldSpacePosition.y*lean;
-    } else {
-        // every flake drifts a little differently
-        keep = drop < BR_SNOW_DENSITY;
-        size *= BR_SNOW_SIZE;
-        velocity.x = velocity.y*(drop - 0.5)*0.3;
-    }
-
     vec3 worldSpacePositionBottom = worldSpacePosition;
-    vec3 worldSpacePositionTop = worldSpacePositionBottom + (velocity*size.y);
+    vec3 worldSpacePositionTop = worldSpacePositionBottom + (Velocity.xyz * Dimensions.y);
 
     vec4 screenSpacePositionBottom = jitterVertexPosition(worldSpacePositionBottom);
     vec4 screenSpacePositionTop = jitterVertexPosition(worldSpacePositionTop);
@@ -72,10 +50,7 @@ void main() {
     vec2 screenSpaceRightDirection = normalize(vec2(-screenSpaceUpDirection.y, screenSpaceUpDirection.x));
 
     vec4 position = mix(screenSpacePositionTop, screenSpacePositionBottom, a_texcoord0.y);
-    position.xy += (0.5 - a_texcoord0.x) * screenSpaceRightDirection * size.x;
-    if (!keep) {
-        position = vec4(2.0, 2.0, 2.0, 1.0);        // outside of the view: the particle is not drawn
-    }
+    position.xy += (0.5 - a_texcoord0.x) * screenSpaceRightDirection * Dimensions.x;
 
     vec2 occlusionUV = ((worldSpacePosition.xz + ViewPosition.xz) * (1.0 / 64.0)) + vec2_splat(0.5);
     float occlusionHeight = (worldSpacePosition.y + ViewPosition.y - 0.5) * (1.0 / 255.0);

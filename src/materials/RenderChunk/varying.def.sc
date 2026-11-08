@@ -15,4 +15,3 @@ vec2          v_lightmapUV              : TEXCOORD1;
 centroid vec2 v_texcoord0               : TEXCOORD0;
 vec3          v_worldPos                : TEXCOORD3;
 vec4          v_worldPosition           : COLOR3;
-vec2          v_water                   : TEXCOORD4;
