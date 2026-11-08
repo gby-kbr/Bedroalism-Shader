@@ -41,6 +41,18 @@
 #define BR_WATER_CLOUD_REFLECTION 1.0 // 0.0 off (faster) ~ 1.0 clouds visible in the water
 #define BR_UNDERWATER_DENSITY 1.0 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
 
+/* Weather */
+#define BR_RAIN_DENSITY  0.55 // 0.2 a few drops ~ 1.0 as many drops as vanilla
+#define BR_RAIN_OPACITY  0.55 // 0.2 faint ~ 1.0 as visible as vanilla
+#define BR_RAIN_WIDTH    0.7  // 0.4 hair thin ~ 1.0 vanilla width
+#define BR_RAIN_SLANT    1.5  // 0.0 straight down ~ 4.0 strong wind
+#define BR_SNOW_DENSITY  0.8  // 0.2 a few flakes ~ 1.0 vanilla
+#define BR_SNOW_OPACITY  0.85 // 0.2 faint ~ 1.0 opaque
+#define BR_SNOW_SIZE     1.0  // 0.5 fine ~ 2.0 large flakes
+#define BR_WET_DARKEN    0.35 // 0.0 no change ~ 0.6 dark, how much wet ground darkens in rain
+#define BR_PUDDLES       1.0  // 0.0 none ~ 1.5 almost every flat surface is covered by a thin puddle
+#define BR_PUDDLE_RIPPLES 1.0 // 0.0 still ~ 2.0 strong, rings of the drops hitting the puddles
+
 /* Exposure and gamma */
 #define BR_EXPOSURE 1.2 // 0.5 dark ~ 2.5 bright
 #define BR_GAMMA    2.2 // 1.8 bright ~ 2.6 dark
