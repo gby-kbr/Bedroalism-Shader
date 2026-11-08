@@ -15,7 +15,6 @@
 
 /* Sun/Moon glow in the sky */
 #define BR_SUN_GLOW  1.0 // 0.0 none ~ 2.0 strong
-#define BR_SUN_GLARE 1.0 // 0.0 off ~ 2.0 strong, dazzle when looking toward the sun
 #define BR_MOON_GLOW 1.0 // 0.0 none ~ 2.0 strong
 
 /* Torch light */

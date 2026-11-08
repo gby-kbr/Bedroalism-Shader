@@ -48,7 +48,6 @@ void main() {
 
         vec4 clouds = brClouds(s_BrCloudNoise, viewDir, env, skyCol, ViewPositionAndTime.w, gl_FragCoord.xy);
         color = mix(color, clouds.rgb, clouds.a);
-        color = brApplyGlare(color, viewDir, env, 1.0);
     }
 
     gl_FragColor = vec4(brColorCorrection(color), 1.0);

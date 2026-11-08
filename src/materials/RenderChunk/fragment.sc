@@ -9,7 +9,6 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/torch.h>
 #include <bedroalism/functions/rain.h>
 #include <bedroalism/functions/fog.h>
-#include <bedroalism/functions/glow.h>
 #include <bedroalism/functions/caustics.h>
 #include <bedroalism/functions/colorcorrection.h>
 
@@ -146,9 +145,6 @@ void main() {
     } else {
         diffuse.rgb = brApplyFog(diffuse.rgb, relPos, CameraPosition.y, v_lightmapUV.y, FogAndDistanceControl.z, env, FogColor.rgb, v_fog.a);
     }
-
-    // dazzle when looking toward the sun, over the fog so that haze glows too
-    diffuse.rgb = brApplyGlare(diffuse.rgb, viewDir, env, v_lightmapUV.y);
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;

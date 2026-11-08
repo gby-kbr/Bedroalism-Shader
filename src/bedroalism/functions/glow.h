@@ -39,40 +39,6 @@ vec3 brSunMoonGlow(vec3 viewDir, brEnvironment env) {
   return (sunCol*sunAmount + vec3(0.55, 0.65, 0.90)*moonAmount)*clear;
 }
 
-// Glare of the sun. Looking toward a bright light, the eye does not see it alone: light scatters inside the
-// eye and spreads as a veil over everything near the line of sight, that washes the colors out, lifts the
-// blacks and leaves a bloom around the sun. The game gives no screen to blur, so it is made per pixel from
-// the angle between the pixel and the sun:
-//   - a bloom, tight around the sun
-//   - a wide veil, the forward scatter of the eye (the same phase function as the sky aureole, broader)
-// Both are stronger when the sun is low (long path through haze, and the eye is looking along the ground),
-// warm at sunrise and sunset, and weaker through clouds and rain. Under a roof, in a cave, under water and in
-// the other dimensions there is none.
-// skyLight: 0.0 ~ 1.0 sky light of the pixel (1.0 for the sky itself)
-vec3 brApplyGlare(vec3 col, vec3 viewDir, brEnvironment env, float skyLight) {
-  float cs = dot(viewDir, env.sunDir);
-  if (BR_SUN_GLARE <= 0.0 || cs <= 0.0) {
-    return col;
-  }
-  float visible = brGlowVisibility(env.sunDir.y)*smoothstep(0.30, 0.75, skyLight)*float(env.overworld);
-  visible *= (1.0 - 0.85*env.rainFactor)*(1.0 - float(env.underwater));
-  if (visible <= 0.0) {
-    return col;
-  }
-
-  float sunLow = 1.0 - clamp(env.sunDir.y, 0.0, 1.0);
-  float lowBoost = 1.0 + 1.5*sunLow*sunLow;
-  vec3 sunCol = mix(vec3(1.15, 1.10, 1.00), vec3(1.50, 0.62, 0.30), env.twilight);
-
-  float bloom = pow(cs, 120.0);                    // about 9 degrees wide
-  float veil = 0.5*brForwardScatter(cs, 0.80);     // 0.5 at the sun, 0.05 at 25 degrees
-  float g = BR_SUN_GLARE*visible*lowBoost*(0.80*bloom + 0.80*veil);
-
-  // the veil lifts everything toward the color of the sun and takes contrast away
-  col = col*(1.0 - clamp(0.45*g, 0.0, 0.6)) + sunCol*g;
-  return col;
-}
-
 // the sun and moon discs, for reflections and for looking up through the water surface
 // dir: normalized direction of the ray. radiance scales the brightness of each disc
 vec3 brSunMoonDisc(vec3 dir, brEnvironment env, float sunRadiance, float moonRadiance) {
