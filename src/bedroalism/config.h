@@ -59,6 +59,7 @@
 #define BR_FOG_MORNING 1.5    // 0.0 none ~ 4.0 dense, extra mist at sunrise
 #define BR_FOG_FALLOFF 0.020  // 0.008 deep fog layer ~ 0.05 thin ground mist, how fast the fog thins out with height
 #define BR_FOG_GLOW    0.30   // 0.0 none ~ 1.0 strong, glow of the sun and moon in the fog
+#define BR_MIST        0.6    // 0.0 none ~ 1.5 very misty, soft veil over the distance on top of the fog: clear nearby, hazy far away
 
 /* Exposure and gamma */
 #define BR_EXPOSURE 1.2 // 0.5 dark ~ 2.5 bright

@@ -43,6 +43,15 @@ float brFogOpticalDepth(float camY, float dirY, float dist, brEnvironment env) {
   return min(d0*dist*k, 8.0);
 }
 
+// mist: a soft veil that is not there up close and grows with the square of the distance, so the scene
+// stays clear nearby and turns hazy far away. At most 35% of the color is replaced. Darker, damper air
+// holds more of it: night, dusk and dawn, rain
+// relDist: distance divided by the render distance
+float brMistAmount(float relDist, brEnvironment env) {
+  float density = BR_MIST*6.0*(1.0 + 1.5*env.night + 1.0*env.twilight + 2.0*env.rainFactor);
+  return 0.35*(1.0 - exp(-relDist*relDist*density));
+}
+
 // the color of the air in the direction dir
 vec3 brFogColor(vec3 dir, brEnvironment env) {
   brSkyColor sky = brSkyColors(env);
@@ -51,8 +60,9 @@ vec3 brFogColor(vec3 dir, brEnvironment env) {
 
 // col: color of the surface. relPos: from the camera to the surface. camY: world height of the camera
 // skyLight: sky light of the surface, 0.0 ~ 1.0, caves have no fog of the open sky
+// renderDist: render distance in blocks
 // vanillaFogColor, vanillaFog: the fog of the game, it still hides the edge of the render distance
-vec3 brApplyFog(vec3 col, vec3 relPos, float camY, float skyLight, brEnvironment env, vec3 vanillaFogColor, float vanillaFog) {
+vec3 brApplyFog(vec3 col, vec3 relPos, float camY, float skyLight, float renderDist, brEnvironment env, vec3 vanillaFogColor, float vanillaFog) {
   if (!env.overworld) {
     return mix(col, vanillaFogColor, vanillaFog);
   }
@@ -60,7 +70,9 @@ vec3 brApplyFog(vec3 col, vec3 relPos, float camY, float skyLight, brEnvironment
   vec3 dir = relPos/max(dist, 0.0001);
   float open = smoothstep(0.15, 0.75, skyLight);
   float optical = brFogOpticalDepth(camY, dir.y, dist, env)*(0.3 + 0.7*open);
-  float amount = max(1.0 - exp(-optical), vanillaFog);
+  float fog = 1.0 - exp(-optical);
+  float mist = brMistAmount(dist/max(renderDist, 1.0), env)*open;
+  float amount = max(1.0 - (1.0 - fog)*(1.0 - mist), vanillaFog);
   vec3 fogCol = mix(vanillaFogColor, brFogColor(dir, env), open);
   return mix(col, fogCol, amount);
 }

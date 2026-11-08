@@ -84,7 +84,7 @@ void main() {
         // same clear water haze as the terrain
         albedo.rgb = brUnderwaterFog(albedo.rgb, length(v_worldPos - eyePos), env, 0.8);
     } else {
-        albedo.rgb = brApplyFog(albedo.rgb, v_worldPos - eyePos, CameraPosition.y, 1.0, env, v_fog.rgb, v_fog.a);
+        albedo.rgb = brApplyFog(albedo.rgb, v_worldPos - eyePos, CameraPosition.y, 1.0, FogAndDistanceControl.z, env, v_fog.rgb, v_fog.a);
     }
     albedo.rgb = brColorCorrection(albedo.rgb);
     gl_FragColor = albedo;

@@ -139,7 +139,7 @@ void main() {
         // clear water haze instead of the thick vanilla fog
         diffuse.rgb = brUnderwaterFog(diffuse.rgb, camDist, env, v_lightmapUV.y);
     } else {
-        diffuse.rgb = brApplyFog(diffuse.rgb, relPos, CameraPosition.y, v_lightmapUV.y, env, FogColor.rgb, v_fog.a);
+        diffuse.rgb = brApplyFog(diffuse.rgb, relPos, CameraPosition.y, v_lightmapUV.y, FogAndDistanceControl.z, env, FogColor.rgb, v_fog.a);
     }
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);
