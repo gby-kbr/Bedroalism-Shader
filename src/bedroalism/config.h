@@ -39,6 +39,7 @@
 #define BR_WATER_WAVE_RANGE  48.0 // blocks around the camera where the surface mesh moves up and down
 #define BR_WATER_SUN_GLITTER 1.0 // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
 #define BR_WATER_CLOUD_REFLECTION 1.0 // 0.0 off (faster) ~ 1.0 clouds visible in the water
+#define BR_CAUSTICS         1.0 // 0.0 off ~ 2.0 strong, the moving light pattern on the bottom, only seen under water in the overworld
 #define BR_UNDERWATER_DENSITY 1.0 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
 
 /* Weather */

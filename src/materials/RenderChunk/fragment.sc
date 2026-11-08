@@ -9,6 +9,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/torch.h>
 #include <bedroalism/functions/rain.h>
 #include <bedroalism/functions/fog.h>
+#include <bedroalism/functions/caustics.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 FogColor;
@@ -133,6 +134,8 @@ void main() {
         // rain: wet ground, thin puddles with the reflection of the sky and the rings of the drops
         diffuse.rgb = brWetSurface(s_BrCloudNoise, diffuse.rgb, albedo, viewDir, geoNormal, v_lightmapUV, relPos.xz + CameraPosition.xz, camDist, FogAndDistanceControl.z, env, ViewPositionAndTime.w, gl_FragCoord.xy);
 #endif
+        // under water: the moving light pattern on the bottom (does nothing outside of the overworld)
+        diffuse.rgb = brCaustics(diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
     }
 
     if (env.underwater) {
