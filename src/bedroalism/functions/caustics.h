@@ -7,56 +7,50 @@
 // Caustics
 //
 // Light that enters the water through a curved surface is focused where the surface bulges like a lens and
-// spread out where it hollows. Sunlight falls through the surface and travels a distance d to the bottom.
-// To first order a ray that enters at p lands at p + d*(1 - 1/n)*grad(h), so the light density on the bottom
-// is 1/det(I + s*H) with H the matrix of second derivatives of the surface height h and s = d*(1 - 1/n).
-// Where det comes close to 0 the light piles up in bright, thin lines that swim as the waves move.
-// The surface used is the visible wave field of water.h plus 4 short, steep ripples that only the light sees.
+// spread out where it hollows, and lands on the bottom as a net of thin bright lines. The texture
+// (textures/environment/caustic_noise.png, made by script/generate_caustic_noise.py) is that net, simulated
+// by sending rays through a random wave surface with Snell's law: 256x256 px for 10x10 blocks, tileable. Its 4
+// channels hold the same surface seen at the water depths 1.5, 3.5, 7 and 12 blocks: shallow caustics are
+// soft, deep ones are sharp and folded. The shader blends the channels by the depth of the point.
+//
+// The animation: two layers of different scale and direction slide over each other, and the depth they are
+// read at swells slowly, so the lines also fold and open like real caustics instead of only drifting.
+// Water bends blue light more than red, so the three colors are read at slightly different depths.
 // Only under water in the overworld: the function returns the color unchanged anywhere else.
 // ---------------------------------------------------------------------------------------------
 
 #define BR_CAUSTIC_SURFACE_Y 62.8   // height of the water surface of the sea
 #define BR_WATER_INDEX       1.333  // refraction index of water
 
-// second derivatives (xx, xz, zz) of one wave of water.h
-vec3 brWaveHessian(vec2 p, float t, vec2 K, float slope) {
-  vec2 k = K*(2.0*BR_PI/512.0);
-  float kl = length(k);
-  float phase = dot(k, p) - sqrt(9.8*kl)*BR_WATER_WAVE_SPEED*t;
-  float amp = slope*BR_WATER_WAVE_HEIGHT/kl;
-  float s = sin(phase);
-  float c = cos(phase);
-  float d2 = amp*exp(s - 1.0)*(c*c - s);
-  return vec3(k.x*k.x, k.x*k.y, k.y*k.y)*d2;
+// weights of the 4 channels (depth 1.5, 3.5, 7, 12 blocks) for a depth in blocks
+vec4 brCausticDepthWeights(float depth) {
+  float f = clamp((depth - 1.5)/2.0, 0.0, 1.0) + clamp((depth - 3.5)/3.5, 0.0, 1.0) + clamp((depth - 7.0)/5.0, 0.0, 1.0);
+  return clamp(1.0 - abs(f - vec4(0.0, 1.0, 2.0, 3.0)), 0.0, 1.0);
 }
 
-// the matrix of second derivatives of the surface. fine: 0.0 ~ 1.0, how much of the short ripples counts
-vec3 brCausticHessian(vec2 p, float t, float fine) {
-  vec3 h = brWaveHessian(p, t, vec2(72.0, 26.0), 0.065);
-  h += brWaveHessian(p, t, vec2(-41.0, 95.0), 0.058);
-  h += brWaveHessian(p, t, vec2(150.0, -60.0), 0.052);
-  h += brWaveHessian(p, t, vec2(-120.0, -250.0), 0.046);
-  h += brWaveHessian(p, t, vec2(330.0, 190.0), 0.040);
-  h += brWaveHessian(p, t, vec2(-300.0, 520.0), 0.032);
-  vec3 f = brWaveHessian(p, t, vec2(610.0, -390.0), 0.030);
-  f += brWaveHessian(p, t, vec2(-480.0, 700.0), 0.028);
-  f += brWaveHessian(p, t, vec2(900.0, 260.0), 0.024);
-  f += brWaveHessian(p, t, vec2(-250.0, -1050.0), 0.022);
-  return h + f*fine;
-}
+// light density on the bottom for red, green and blue, 1.0 is the light of a flat surface
+// p: where the light entered the surface (x, z), blocks. depth: blocks of water above the point
+vec3 brCausticLight(sampler2D tex, vec2 p, float t, float depth) {
+  // layer 1: 10 block tile, drifts one way. layer 2: turned and smaller, drifts the other way
+  vec2 uv1 = p*0.1 + vec2(0.040, 0.022)*t;
+  vec2 uv2 = vec2(0.80*p.x - 0.60*p.y, 0.60*p.x + 0.80*p.y)*0.153 + vec2(-0.030, 0.046)*t;
+  vec4 c1 = texture2D(tex, uv1)*8.0;
+  vec4 c2 = texture2D(tex, uv2)*8.0;
 
-// light density on the bottom, 1.0 is the light of a flat surface
-// p: where the light entered the surface (x, z). depth: blocks of water above the point
-float brCausticLight(vec2 p, float t, float depth, float fine) {
-  vec3 h = brCausticHessian(p, t, fine);
-  float s = depth*(1.0 - 1.0/BR_WATER_INDEX);
-  float det = (1.0 + s*h.x)*(1.0 + s*h.z) - s*s*h.y*h.y;
-  return min(1.0/max(abs(det), 0.12), 8.0);
+  // the depth swells, a little differently for each layer
+  float d1 = depth*(1.0 + 0.22*sin(0.9*t + 1.3));
+  float d2 = depth*(1.0 + 0.22*sin(0.7*t + 4.1));
+  vec3 disp = vec3(0.93, 1.0, 1.07);                       // red is bent least, blue most
+  vec3 l1 = vec3(dot(c1, brCausticDepthWeights(d1*disp.x)), dot(c1, brCausticDepthWeights(d1*disp.y)), dot(c1, brCausticDepthWeights(d1*disp.z)));
+  vec3 l2 = vec3(dot(c2, brCausticDepthWeights(d2*disp.x)), dot(c2, brCausticDepthWeights(d2*disp.y)), dot(c2, brCausticDepthWeights(d2*disp.z)));
+
+  // two surfaces cross: where both focus, the light piles up
+  return sqrt(l1*l2)*1.45;
 }
 
 // col: the lit color of a surface. worldXZ, worldY: where it is. camDist: distance to the camera, blocks
 // geoNormal: normal of the face toward the camera. skyLight: lightmap y of the surface
-vec3 brCaustics(vec3 col, vec2 worldXZ, float worldY, float camDist, vec3 geoNormal, float skyLight, brEnvironment env, float time) {
+vec3 brCaustics(sampler2D tex, vec3 col, vec2 worldXZ, float worldY, float camDist, vec3 geoNormal, float skyLight, brEnvironment env, float time) {
   if (!env.overworld || !env.underwater) {
     return col;
   }
@@ -71,8 +65,7 @@ vec3 brCaustics(vec3 col, vec2 worldXZ, float worldY, float camDist, vec3 geoNor
   vec2 entry = worldXZ + toSun*(depth*sinR/sqrt(1.0 - sinR*sinR));
 
   vec2 p = mod(entry, vec2(512.0, 512.0));
-  float fine = 1.0 - smoothstep(12.0, 40.0, camDist);        // short ripples would only flicker far away
-  float light = brCausticLight(p, time, depth, fine);
+  vec3 light = brCausticLight(tex, p, time, depth);
 
   // only sunlight makes the pattern: by day, in the open sky light, fading with the depth as the water absorbs
   float sun = env.day + 0.5*env.twilight;
@@ -81,8 +74,7 @@ vec3 brCaustics(vec3 col, vec2 worldXZ, float worldY, float camDist, vec3 geoNor
   float reach = exp(-0.16*depth)*(1.0 - smoothstep(30.0, 70.0, camDist));
   float k = clamp(BR_CAUSTICS*sun*open*up*reach*(1.0 - 0.6*env.rainFactor), 0.0, 1.0);
 
-  vec3 tint = vec3(0.92, 1.0, 1.08);
-  return col*mix(vec3(1.0, 1.0, 1.0), tint*light*0.75, k);
+  return col*mix(vec3(1.0, 1.0, 1.0), light, k);
 }
 
 #endif

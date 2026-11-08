@@ -23,6 +23,7 @@ uniform vec4 CameraPosition;
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_LightMapTexture);
 SAMPLER2D_AUTOREG(s_BrCloudNoise);
+SAMPLER2D_AUTOREG(s_BrCausticNoise);
 #if defined(SEASONS)
 SAMPLER2D_AUTOREG(s_SeasonsTexture);
 #endif
@@ -135,7 +136,7 @@ void main() {
         diffuse.rgb = brWetSurface(s_BrCloudNoise, diffuse.rgb, albedo, viewDir, geoNormal, v_lightmapUV, relPos.xz + CameraPosition.xz, camDist, FogAndDistanceControl.z, env, ViewPositionAndTime.w, gl_FragCoord.xy);
 #endif
         // under water: the moving light pattern on the bottom (does nothing outside of the overworld)
-        diffuse.rgb = brCaustics(diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
+        diffuse.rgb = brCaustics(s_BrCausticNoise, diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
     }
 
     if (env.underwater) {
