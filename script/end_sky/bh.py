@@ -14,7 +14,7 @@ from common import *
 
 R0 = 24.0                      # observer radius: the shadow radius is about 12 degrees of the sky
 INCL = np.radians(3.2)         # elevation of the observer above the disk plane
-ROLL = np.radians(0.0)         # tilt of the picture of the black hole: 0 keeps the disk plane horizontal (straight rings)
+ROLL = np.radians(14.0)        # tilt of the black hole picture, the disk plane leans to one side (0 = straight rings)
 R_IN, R_OUT = 6.0, 13.0
 LENS_BACKGROUND = False        # True bends the star field around the black hole; False keeps the sky behind it undistorted        # accretion disk from the innermost stable orbit outwards
 DPHI, NSTEP = 0.0225, 440      # integration step and count, phi up to ~ 3 pi
