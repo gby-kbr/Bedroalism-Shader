@@ -15,6 +15,7 @@
 
 /* Sun/Moon glow in the sky */
 #define BR_SUN_GLOW  1.0 // 0.0 none ~ 2.0 strong
+#define BR_SUN_GLARE 1.0 // 0.0 off ~ 2.0 strong, dazzle when looking toward the sun
 #define BR_MOON_GLOW 1.0 // 0.0 none ~ 2.0 strong
 
 /* Torch light */
@@ -30,6 +31,7 @@
 /* Shadow */
 #define BR_SHADOW_STRENGTH   0.65 // 0.0 none ~ 1.0 black
 #define BR_SHADOW_SUN_FOLLOW 1.0  // 0.0 side shadows always on the same faces ~ 1.0 side shadows follow the sun and moon
+#define BR_SHADOW_TINT 1.0 // 0.0 grey shadows ~ 1.5 strongly cool shadows and warm sunlit places
 
 /* Water */
 #define BR_WATER_COLOR      vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water

@@ -10,6 +10,7 @@ $input v_clipPosition, v_color0, v_dirLight, v_fog, v_light, v_texcoord0, v_worl
 #include <bedroalism/functions/torch.h>
 #include <bedroalism/functions/colorcorrection.h>
 #include <bedroalism/functions/fog.h>
+#include <bedroalism/functions/glow.h>
 
 uniform vec4 ColorBased;
 uniform vec4 ChangeColor;
@@ -86,6 +87,8 @@ void main() {
     } else {
         albedo.rgb = brApplyFog(albedo.rgb, v_worldPos - eyePos, CameraPosition.y, 1.0, FogAndDistanceControl.z, env, v_fog.rgb, v_fog.a);
     }
+    // dazzle when looking toward the sun; the sky light is estimated from the light color of the tile
+    albedo.rgb = brApplyGlare(albedo.rgb, normalize(v_worldPos - eyePos), env, clamp(brEntityAmbient(TileLightColor.rgb).b, 0.0, 1.0));
     albedo.rgb = brColorCorrection(albedo.rgb);
     gl_FragColor = albedo;
 #endif
