@@ -33,7 +33,9 @@ vec3 brTorchColor(brEnvironment env, float blockLight) {
     return BR_END_TORCH_COL;
   }
   if (env.nether) {
-    return BR_NETHER_TORCH_COL;
+    // the fire light crosses the dusty air of the Nether: close to the source it is orange, further away only
+    // the red is left
+    return mix(vec3(1.00, 0.30, 0.08), BR_NETHER_TORCH_COL, smoothstep(0.35, 1.0, blockLight));
   }
   return BR_OVERWORLD_TORCH_COL;
 }
@@ -47,11 +49,22 @@ float brTorchFlicker(vec2 pos, float t) {
   return 1.0 - BR_TORCH_FLICKER*(0.5 + 0.5*f);
 }
 
+// Lava and fire in the Nether do not flicker like a flame: they glow and fade like embers. Slower waves
+// than a torch, deeper, and now and then two of them meet in a short brighter pulse. Never dark
+float brEmberFlicker(vec2 pos, float t) {
+  float phase = dot(pos, vec2(0.23, 0.31));
+  float slow = 0.5*sin(t*0.9 + phase) + 0.3*sin(t*1.7 + 1.9*phase + 1.1) + 0.2*sin(t*3.1 + 0.7*phase + 2.3);
+  float pulse = pow(0.5 + 0.5*sin(t*1.3 + phase*1.3)*sin(t*2.1 + phase*0.6 + 1.0), 6.0);
+  float f = clamp(0.5 + 0.5*slow + 0.35*pulse, 0.0, 1.0);
+  return 1.0 - BR_NETHER_FLICKER*(1.0 - f);
+}
+
 // light to add to the ambient light of a face
 // ambient: ambient light of the face (sky light, no torch). pos: absolute xz of the fragment
 vec3 brTorchLight(float blockLight, vec3 ambient, brEnvironment env, vec2 pos, float t) {
   float lum = dot(ambient, vec3(0.299, 0.587, 0.114));
-  float amount = BR_TORCH_INTENSITY*brTorchFalloff(blockLight)*brTorchFlicker(pos, t);
+  float flicker = env.nether ? brEmberFlicker(pos, t) : brTorchFlicker(pos, t);
+  float amount = BR_TORCH_INTENSITY*brTorchFalloff(blockLight)*flicker;
   return brTorchColor(env, blockLight)*(amount/(1.0 + lum));
 }
 

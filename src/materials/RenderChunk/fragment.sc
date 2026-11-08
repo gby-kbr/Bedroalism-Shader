@@ -10,6 +10,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/rain.h>
 #include <bedroalism/functions/fog.h>
 #include <bedroalism/functions/caustics.h>
+#include <bedroalism/functions/lava.h>
 #include <bedroalism/functions/colorcorrection.h>
 
 uniform vec4 FogColor;
@@ -122,7 +123,16 @@ void main() {
     }
 #endif
 
-    if (!isWater) {
+    // lava: it lights itself, the surface is built from the cell noise
+    bool isLava = false;
+#if !defined(ALPHA_TEST) && !defined(RENDER_AS_BILLBOARDS)
+    if (v_water.x < -0.5) {
+        isLava = true;
+        diffuse.rgb = brLavaSurface(s_BrCloudNoise, relPos.xz + CameraPosition.xz, ViewPositionAndTime.w, camDist);
+    }
+#endif
+
+    if (!isWater && !isLava) {
         // ambient light of the sky (the lightmap without block light) plus our own torch light
         vec3 albedo = diffuse.rgb;
         vec2 skyOnly = vec2(0.0, v_lightmapUV.y);

@@ -10,6 +10,7 @@ $output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV
 #include <bedroalism/config.h>
 #include <bedroalism/functions/water.h>
 #include <bedroalism/functions/wave.h>
+#include <bedroalism/functions/lava.h>
 
 uniform vec4 RenderChunkFogAlpha;
 uniform vec4 FogAndDistanceControl;
@@ -72,6 +73,15 @@ void main() {
                 worldPos.y += brWaterDisplacement(wavePos, ViewPositionAndTime.w, waterDist);
             }
         }
+    }
+#endif
+
+    // lava: the top face of a lava block swells slowly, the pattern of the surface is made in the fragment
+#if !defined(ALPHA_TEST) && !defined(RENDER_AS_BILLBOARDS) && !defined(INSTANCING)
+    if (brIsLavaTop(a_color0, fract(a_position), lightmapUV, uv0)) {
+        water.x = -1.0;
+        vec3 lavaRel = worldPos - ViewPositionAndTime.xyz;
+        worldPos.y += brLavaSwell(lavaRel.xz + CameraPosition.xz, ViewPositionAndTime.w);
     }
 #endif
 

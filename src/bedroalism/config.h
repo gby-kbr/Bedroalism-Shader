@@ -27,6 +27,11 @@
 #define BR_END_TORCH_COL          vec3(1.00, 0.58, 0.22)
 #define BR_UNDERWATER_TORCH_COL   vec3(1.00, 0.62, 0.28) // before the water takes the red out of it
 
+/* Nether fire and lava */
+#define BR_NETHER_FLICKER   0.20 // 0.0 steady ~ 0.4 lively, how much the light of lava and fire breathes
+#define BR_LAVA_SWELL       0.035 // 0.0 flat ~ 0.07, how far the lava surface rises and falls (blocks)
+#define BR_LAVA_BRIGHTNESS  1.0  // 0.5 dim ~ 2.0 blinding
+
 /* Shadow */
 #define BR_SHADOW_STRENGTH   0.65 // 0.0 none ~ 1.0 black
 #define BR_SHADOW_SUN_FOLLOW 1.0  // 0.0 side shadows always on the same faces ~ 1.0 side shadows follow the sun and moon
