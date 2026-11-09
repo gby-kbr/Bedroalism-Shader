@@ -25,6 +25,7 @@ vec3 brUnderwaterFog(vec3 col, float dist, brEnvironment env, float skyLight) {
 // returns the color and opacity, to be blended over what is behind the surface
 vec4 brUnderwaterSurface(vec3 viewDir, vec3 nrm, brEnvironment env) {
   vec3 scatter = brWaterScatterColor(env, 0.9);
+  nrm = normalize(mix(nrm, vec3(0.0, -1.0, 0.0), BR_UNDERWATER_SURFACE_SMOOTH)); // calmer waves from below
   float eta = 1.333;
   float cosI = clamp(-dot(viewDir, nrm), 0.0, 1.0);
   float k = 1.0 - eta*eta*(1.0 - cosI*cosI);

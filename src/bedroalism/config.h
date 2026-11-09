@@ -46,5 +46,6 @@
 #define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
 #define BR_CAUSTICS          2.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom, only under water
 #define BR_UNDERWATER_DENSITY 1.0 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
+#define BR_UNDERWATER_SURFACE_SMOOTH 0.75 // 0 = full waves, 1 = flat surface seen from below
 
 #endif
