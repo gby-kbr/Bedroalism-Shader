@@ -100,10 +100,9 @@ void main() {
         }
 
         if (top && viewDir.y > 0.0) {
-            // under the surface: the sky through the water, bent by it, with the sun and moon in it.
-            // Where a roof covers the water the surface turns see-through so the roof stays visible
+            // under the surface: as clear as from above, with the sun and moon showing through
             float skyVisible = smoothstep(0.55, 0.95, v_lightmapUV.y);
-            diffuse = vec4(brUnderwaterSurface(viewDir, -nrm, env, skyVisible), mix(0.55, 1.0, skyVisible));
+            diffuse = brUnderwaterSurface(viewDir, -nrm, env, skyVisible);
         } else {
             diffuse = brWaterAbove(viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky);
         }
