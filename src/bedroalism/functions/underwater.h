@@ -18,24 +18,18 @@ vec3 brUnderwaterFog(vec3 col, float dist, brEnvironment env, float skyLight) {
   return col*T + brWaterScatterColor(env, skyLight)*(1.0 - T);
 }
 
-// The surface seen from below, as clear as the surface seen from above: the same transparency at every
-// angle (no total internal reflection, so no round window). The sun and the moon are the real ones,
-// seen through it.
+// The surface seen from below, with the same opacity formula as the surface seen from above, so it is
+// equally clear. No total internal reflection (no round window). The sun and the moon are the real ones.
 // viewDir: normalized, pointing up. nrm: normal of the surface, pointing down (toward the eye)
 // returns the color and opacity, to be blended over what is behind the surface
 vec4 brUnderwaterSurface(vec3 viewDir, vec3 nrm, brEnvironment env) {
   vec3 scatter = brWaterScatterColor(env, 0.9);
   nrm = normalize(mix(nrm, vec3(0.0, -1.0, 0.0), BR_UNDERWATER_SURFACE_SMOOTH)); // calmer waves from below
-  float eta = 1.333;
-  float cosI = clamp(-dot(viewDir, nrm), 0.0, 1.0);
-  float k = 1.0 - eta*eta*(1.0 - cosI*cosI);
-  float cosT = sqrt(max(k, 0.0));
-
-  float fresnel = min(brFresnel(cosT, 0.02), 0.3); // capped, so low angles stay clear
+  float cosV = clamp(-dot(viewDir, nrm), 0.0, 1.0);
+  float fresnel = brFresnel(cosV, 0.02);
   float hide = -log(1.0 - clamp(BR_WATER_OPACITY, 0.01, 0.95));
-  float transmit = exp(-hide/max(cosI, 0.12)); // the same body as from above
+  float transmit = exp(-hide/max(cosV, 0.12)); // identical to brWaterAbove
   float alpha = 1.0 - (1.0 - fresnel)*transmit;
-
   return vec4(scatter, alpha);
 }
 
