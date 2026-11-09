@@ -36,6 +36,8 @@
 #define BR_FOG_RAIN    2.0    // 0.0 none ~ 5.0 dense, extra fog in rain
 #define BR_FOG_DAWN    1.5    // 0.0 none ~ 4.0 dense, extra mist at sunrise and sunset
 #define BR_RAIN_MIST   0.35   // 0.0 none ~ 0.6 thick, banks of mist that drift with the wind in rain
+#define BR_GROUND_MIST 0.006  // 0.0 none ~ 0.02 thick, low patchy mist over water and ground
+#define BR_GROUND_MIST_FALLOFF 0.12// 0.05 deep layer ~ 0.25 thin layer hugging the ground
 
 // Water
 #define BR_WATER_COLOR       vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
