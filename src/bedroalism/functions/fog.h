@@ -44,9 +44,9 @@ float brNoise(vec2 p) {
 
 // thickness of the mist patches over the ground, around 1.0. p: world xz in blocks
 float brMistPatch(vec2 p, float t) {
-  vec2 q = (p + vec2(1.0, 0.45)*2.5*t)*0.012;
+  vec2 q = (p + vec2(1.0, 0.45)*2.5*t)*0.03;
   float n = 0.55*brNoise(q) + 0.3*brNoise(q*2.1 + 7.0) + 0.15*brNoise(q*4.3 + 3.0);
-  return mix(0.0, 2.6, smoothstep(0.35, 0.7, n));
+  return mix(0.0, 3.0, smoothstep(0.4, 0.62, n));
 }
 
 // A low layer of mist that clings to the water and the ground. Its density falls quickly with height,
@@ -87,8 +87,9 @@ vec3 brApplyFog(vec3 col, vec3 relPos, vec2 worldXZ, float camY, float skyLight,
 
   // ground mist: whiter than the sky and brighter toward the sun
   float ground = 1.0 - exp(-brGroundMist(worldXZ - relPos.xz, relPos.xz, camY, dir.y, dist, t, env)*open);
-  float toSun = pow(max(dot(dir, env.sunDir), 0.0), 6.0)*env.day;
-  vec3 mistCol = fogCol*(1.0 + 0.5*env.day) + vec3(0.55, 0.5, 0.42)*toSun;
+  float s = max(dot(dir, env.sunDir), 0.0);
+  float toSun = (0.6*pow(s, 4.0) + 1.4*pow(s, 24.0))*env.day;
+  vec3 mistCol = fogCol*(1.0 + 0.6*env.day) + vec3(0.6, 0.55, 0.45)*toSun;
   return mix(col, mistCol, ground);
 }
 
