@@ -3,6 +3,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bgfx_shader.sh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/colorcorrection.h>
+#include <bedroalism/functions/fog.h>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 
 uniform vec4 FogColor;
@@ -10,6 +11,9 @@ uniform vec4 DitherParams;
 uniform vec4 DitherParams2[3];
 uniform vec4 ViewPositionAndTime;
 
+uniform vec4 FogAndDistanceControl;
+uniform vec4 TimeOfDay;
+uniform vec4 CameraPosition;
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_LightMapTexture);
 #if defined(SEASONS)
@@ -69,7 +73,9 @@ void main() {
 #endif
 
     diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
-    diffuse.rgb = mix(diffuse.rgb, FogColor.rgb, v_fog.a);
+    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+    vec3 relPos = v_worldPosition.xyz - ViewPositionAndTime.xyz;
+    diffuse.rgb = brApplyFog(diffuse.rgb, relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, v_lightmapUV.y, FogAndDistanceControl.z, ViewPositionAndTime.w, env, FogColor.rgb, v_fog.a);
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;

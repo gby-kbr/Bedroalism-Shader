@@ -27,5 +27,17 @@
 #define BR_DAWN_HORIZON_COL  vec3(3.0, 0.4, 0.4)
 #define BR_NIGHT_ZENITH_COL  vec3(0.008, 0.048, 0.08)
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
+#define BR_RAIN_ZENITH_COL   vec3(0.47, 0.51, 0.56)
+#define BR_RAIN_HORIZON_COL  vec3(0.6, 0.6, 0.6)
+#define BR_SKY_RAIN_MIX      0.9 // 0.0 no change ~ 1.0 fully overcast in rain
+#define BR_UNDERWATER_TINT   vec3(0.9, 1.0, 0.9)
+
+// Fog, overworld only
+#define BR_FOG_DENSITY 0.0065 // 0.0015 thin ~ 0.012 thick, light lost per block at sea level
+#define BR_FOG_FALLOFF 0.02   // 0.008 deep layer ~ 0.05 thin ground mist, thinning with height
+#define BR_FOG_RAIN    2.0    // 0.0 none ~ 5.0 dense, extra fog in rain
+#define BR_FOG_DAWN    1.5    // 0.0 none ~ 4.0 dense, extra mist at sunrise and sunset
+#define BR_RAIN_MIST   0.35   // 0.0 none ~ 0.6 thick, banks of mist that drift with the wind in rain
+#define BR_UNDERWATER_DENSITY 0.04 // 0.02 clear ~ 0.1 murky, per block
 
 #endif
