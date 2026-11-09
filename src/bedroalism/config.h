@@ -29,7 +29,7 @@
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
 #define BR_RAIN_ZENITH_COL   vec3(0.47, 0.51, 0.56)
 #define BR_RAIN_HORIZON_COL  vec3(0.6, 0.6, 0.6)
-#define BR_SKY_RAIN_MIX      0.9 // 0.0 no change ~ 1.0 fully overcast in rain
+#define BR_SKY_RAIN_MIX      1.0 // 0.0 no change ~ 1.0 fully overcast in rain
 #define BR_UNDERWATER_TINT   vec3(0.9, 1.0, 0.9)
 
 // Fog, overworld only
