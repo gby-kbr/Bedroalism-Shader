@@ -2,8 +2,6 @@
 #define BR_COLORCORRECTION_H
 
 // Uchimura 2017, "HDR theory and practice"
-// A toe that deepens the shadows, a straight section that keeps the colors true, and a soft
-// shoulder that rolls bright values off instead of clipping them. Settings are in config.h.
 float brUchimura(float x) {
   const float P = BR_UCHIMURA_P;
   const float a = BR_UCHIMURA_A;
@@ -34,7 +32,6 @@ vec3 brTonemap(vec3 col) {
   return vec3(brUchimura(col.r), brUchimura(col.g), brUchimura(col.b));
 }
 
-// col: linear scene color, returns the color to display
 vec3 brColorCorrection(vec3 col) {
   col = brTonemap(col*BR_EXPOSURE);
   return pow(col, vec3_splat(1.0 / BR_GAMMA));

@@ -3,30 +3,26 @@
 
 #include "utils.h"
 
-// What the shader can tell about the world from the uniforms the game gives every material.
-// The detection logic follows Newb X (functions/detection.h).
 struct brEnvironment {
   bool end;
   bool nether;
   bool underwater;
   float rainFactor; // [0.0, 1.0]
-  float dayFactor;  // [-1.0, 1.0], 1.0 noon, 0.0 sunrise and sunset, -1.0 midnight
+  float dayFactor;  // [-1.0, 1.0]
   vec3 sunDir;      // normalized
   vec3 moonDir;     // normalized
   vec3 fogCol;      // [0.0, 1.0]
 };
 
 bool brDetectEnd(vec3 FOG_COLOR) {
-  // the End fog color is set to #400040 in fogs/the_end_fog_setting.json to help the detection
+  // fog color is set to #400040 in fogs/the_end_fog_setting.json
   return FOG_COLOR.r==FOG_COLOR.b && (FOG_COLOR.r-FOG_COLOR.g>0.24 || (FOG_COLOR.g==0.0 && FOG_COLOR.r>0.1));
 }
 
 bool brDetectNether(vec3 FOG_COLOR, vec2 FOG_CONTROL) {
-  // FOG_CONTROL.xy varies with the render distance
-  // reverse plotted relation (5, 6, 7, 8, 9, 11, 12, 20, 96 chunks) with an accuracy of 0.02
+  // FOG_CONTROL.x follows the render distance, fitted with an accuracy of 0.02
   float expectedFogX = 0.029 + (0.09*FOG_CONTROL.y*FOG_CONTROL.y);
 
-  // nether wastes, basalt deltas, crimson forest, warped forest, soul sand valley
   bool netherFogCtrl = (FOG_CONTROL.x<0.14 && abs(FOG_CONTROL.x-expectedFogX) < 0.02);
   bool netherFogCol = (FOG_COLOR.r+FOG_COLOR.g)>0.0;
 
@@ -41,13 +37,16 @@ bool brDetectUnderwater(vec3 FOG_COLOR, vec2 FOG_CONTROL) {
 }
 
 float brDetectRain(vec3 FOG_CONTROL) {
-  // the clear weather FOG_CONTROL.x varies with the render distance (z)
-  // reverse plotted as 0.5 + 1.25/k, k being the render distance in chunks (z = k*16)
+  // clear weather FOG_CONTROL.x is 0.5 + 1.25/k, k = render distance in chunks (z = k*16)
   vec2 clear = vec2(0.5 + 20.0/FOG_CONTROL.z, 1.0);
   vec2 rain = vec2(0.23, 0.70);
   vec2 factor = clamp((FOG_CONTROL.xy-clear)/(rain-clear), vec2(0.0, 0.0), vec2(1.0, 1.0));
   float val = factor.x*factor.y;
   return val*val*(3.0 - 2.0*val);
+}
+
+float brDetectDayFactor(vec3 FOG_COLOR) {
+  return min(dot(FOG_COLOR, vec3(0.5, 0.7, 0.5)), 1.0);
 }
 
 brEnvironment brCalculateSunParams(brEnvironment env, float TIME_OF_DAY) {

@@ -3,7 +3,6 @@
 
 #define BR_PI 3.141592
 
-// rotates v counter-clockwise by t (radians)
 vec2 brRotate2D(vec2 v, float t) {
   float c = cos(t);
   float s = sin(t);
