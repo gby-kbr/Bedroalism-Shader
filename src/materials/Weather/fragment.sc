@@ -1,6 +1,8 @@
 $input v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
+#include <bedroalism/config.h>
+#include <bedroalism/functions/colorcorrection.h>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 
 uniform vec4 OcclusionHeightOffset;
@@ -48,5 +50,6 @@ void main() {
         diffuse.rgb *= light;
         diffuse.rgb = applyFog(diffuse.rgb, v_fog.rgb, v_fog.a);
     }
+    diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;
 }

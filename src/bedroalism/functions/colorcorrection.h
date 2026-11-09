@@ -1,24 +1,37 @@
 #ifndef BR_COLORCORRECTION_H
 #define BR_COLORCORRECTION_H
 
-// Filmic curve after Hable, "Filmic Tonemapping Operators" (Uncharted 2): a soft toe that
-// deepens the shadows, a straight middle with contrast, and a long shoulder that rolls bright
-// values off gently instead of clipping them.
-vec3 brFilmicCurve(vec3 x) {
-  const float A = 0.15; // shoulder strength
-  const float B = 0.50; // linear strength
-  const float C = 0.10; // linear angle
-  const float D = 0.20; // toe strength
-  const float E = 0.02; // toe numerator
-  const float F = 0.30; // toe denominator
-  return ((x*(A*x + C*B) + D*E) / (x*(A*x + B) + D*F)) - E/F;
+// Uchimura 2017, "HDR theory and practice"
+// A toe that deepens the shadows, a straight section that keeps the colors true, and a soft
+// shoulder that rolls bright values off instead of clipping them. Settings are in config.h.
+float brUchimura(float x) {
+  const float P = BR_UCHIMURA_P;
+  const float a = BR_UCHIMURA_A;
+  const float m = BR_UCHIMURA_M;
+  const float l = BR_UCHIMURA_L;
+  const float c = BR_UCHIMURA_C;
+  const float b = BR_UCHIMURA_B;
+
+  float l0 = ((P - m) * l) / a;
+  float s0 = m + l0;
+  float s1 = m + a * l0;
+  float c2 = (a * P) / (P - s1);
+  float cp = -c2 / P;
+
+  float w0 = 1.0 - smoothstep(0.0, m, x);
+  float w2 = step(s0, x);
+  float w1 = 1.0 - w0 - w2;
+
+  float toe = m * pow(x / m, c) + b;
+  float lin = m + a * (x - m);
+  float shoulder = P - (P - s1) * exp(cp * (x - s0));
+
+  return toe*w0 + lin*w1 + shoulder*w2;
 }
 
 vec3 brTonemap(vec3 col) {
-  const float W = 11.2; // linear white point
   col = max(col, vec3(0.0, 0.0, 0.0));
-  vec3 white = brFilmicCurve(vec3_splat(W));
-  return clamp(brFilmicCurve(col*BR_FILMIC_BIAS) / white, 0.0, 1.0);
+  return vec3(brUchimura(col.r), brUchimura(col.g), brUchimura(col.b));
 }
 
 // col: linear scene color, returns the color to display

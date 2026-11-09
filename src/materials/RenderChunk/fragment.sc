@@ -1,6 +1,8 @@
 $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
+#include <bedroalism/config.h>
+#include <bedroalism/functions/colorcorrection.h>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 
 uniform vec4 FogColor;
@@ -69,6 +71,7 @@ void main() {
     diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
     diffuse.rgb = mix(diffuse.rgb, FogColor.rgb, v_fog.a);
 
+    diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;
 #endif
 }
