@@ -13,4 +13,11 @@
 #define BR_UCHIMURA_C 1.3  // black tightness, 1.0 lifted ~ 1.6 deep
 #define BR_UCHIMURA_B 0.0  // pedestal, keep 0.0 so black stays black on additive layers (sun, stars)
 
+
+// Path of the sun and the moon across the sky
+#define BR_SUN_PATH_YAW    15.0
+#define BR_MOON_PATH_YAW   17.0
+#define BR_SUN_PATH_TILT   31.0
+#define BR_MOON_PATH_TILT -28.0
+
 #endif
