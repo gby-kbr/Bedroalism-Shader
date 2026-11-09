@@ -13,12 +13,11 @@
 #define BR_UCHIMURA_C 1.3  // black tightness, 1.0 lifted ~ 1.6 deep
 #define BR_UCHIMURA_B 0.0  // pedestal, keep 0.0 or additive layers (sun, stars) lift black
 
-// Sun and moon path
-#define BR_SUN_PATH_YAW    15.0
-#define BR_MOON_PATH_YAW   17.0
-#define BR_SUN_PATH_TILT   31.0
-#define BR_MOON_PATH_TILT -28.0
-
+// Sun and moon path in degrees, must match the SunMoon material (the game's own sun has no tilt)
+#define BR_SUN_PATH_YAW    0.0
+#define BR_MOON_PATH_YAW   0.0
+#define BR_SUN_PATH_TILT   0.0
+#define BR_MOON_PATH_TILT  0.0
 
 // Sky colors, linear, from Newb X
 #define BR_DAY_ZENITH_COL    vec3(0.3, 0.9, 2.0)
@@ -30,7 +29,6 @@
 #define BR_RAIN_ZENITH_COL   vec3(0.47, 0.51, 0.56)
 #define BR_RAIN_HORIZON_COL  vec3(0.6, 0.6, 0.6)
 #define BR_SKY_RAIN_MIX      1.0 // 0.0 no change ~ 1.0 fully overcast in rain
-#define BR_UNDERWATER_TINT   vec3(0.9, 1.0, 0.9)
 
 // Fog, overworld only
 #define BR_FOG_DENSITY 0.0065 // 0.0015 thin ~ 0.012 thick, light lost per block at sea level
@@ -38,6 +36,15 @@
 #define BR_FOG_RAIN    2.0    // 0.0 none ~ 5.0 dense, extra fog in rain
 #define BR_FOG_DAWN    1.5    // 0.0 none ~ 4.0 dense, extra mist at sunrise and sunset
 #define BR_RAIN_MIST   0.35   // 0.0 none ~ 0.6 thick, banks of mist that drift with the wind in rain
-#define BR_UNDERWATER_DENSITY 0.04 // 0.02 clear ~ 0.1 murky, per block
+
+// Water
+#define BR_WATER_COLOR       vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
+#define BR_WATER_OPACITY     0.35 // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
+#define BR_WATER_WAVE_HEIGHT 1.0  // 0.0 flat ~ 2.0 rough
+#define BR_WATER_WAVE_SPEED  0.8  // 0.0 still ~ 2.0 fast
+#define BR_WATER_WAVE_RANGE  48.0 // blocks around the camera where the surface mesh moves
+#define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
+#define BR_CAUSTICS          1.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom, only under water
+#define BR_UNDERWATER_DENSITY 1.0 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
 
 #endif

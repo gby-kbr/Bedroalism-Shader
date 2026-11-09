@@ -7,8 +7,12 @@ struct brEnvironment {
   bool end;
   bool nether;
   bool underwater;
+  bool overworld;
   float rainFactor; // [0.0, 1.0]
   float dayFactor;  // [-1.0, 1.0]
+  float day;        // [0.0, 1.0]
+  float night;      // [0.0, 1.0]
+  float twilight;   // [0.0, 1.0] sunrise and sunset
   vec3 sunDir;      // normalized
   vec3 moonDir;     // normalized
   vec3 fogCol;      // [0.0, 1.0]
@@ -51,9 +55,13 @@ float brDetectDayFactor(vec3 FOG_COLOR) {
 
 brEnvironment brCalculateSunParams(brEnvironment env, float TIME_OF_DAY) {
   float t = 2.0 * BR_PI * TIME_OF_DAY;
-  vec3 sunDir = vec3(sin(t), cos(t), 0.0);
+  // the game's sun rises in the east (+x), Newb X mirrors it because its own sun quad is mirrored
+  vec3 sunDir = vec3(-sin(t), cos(t), 0.0);
   vec3 moonDir = vec3(-sunDir.x, -sunDir.y, 0.0);
   env.dayFactor = sunDir.y;
+  env.day = smoothstep(0.0, 0.4, env.dayFactor);
+  env.night = 1.0 - smoothstep(-0.22, 0.0, env.dayFactor);
+  env.twilight = clamp(1.0 - env.day - env.night, 0.0, 1.0);
 
   sunDir.yz = brRotate2D(sunDir.yz, -brDegToRad(BR_SUN_PATH_TILT));
   sunDir.xz = brRotate2D(sunDir.xz, brDegToRad(BR_SUN_PATH_YAW));
@@ -71,6 +79,7 @@ brEnvironment brDetectEnvironment(float TIME_OF_DAY, vec3 FOG_COLOR, vec3 FOG_CO
   env.end = brDetectEnd(FOG_COLOR);
   env.nether = brDetectNether(FOG_COLOR, FOG_CONTROL.xy);
   env.underwater = brDetectUnderwater(FOG_COLOR, FOG_CONTROL.xy);
+  env.overworld = !env.end && !env.nether;
   env.rainFactor = brDetectRain(FOG_CONTROL.xyz);
   env.fogCol = FOG_COLOR;
   env = brCalculateSunParams(env, TIME_OF_DAY);

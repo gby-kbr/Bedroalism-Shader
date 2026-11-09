@@ -1,9 +1,10 @@
-$input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_worldPos
+$input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_water, v_worldPos
 
 #include <bgfx_shader.sh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/colorcorrection.h>
 #include <bedroalism/functions/fog.h>
+#include <bedroalism/functions/caustics.h>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 
 uniform vec4 FogColor;
@@ -16,6 +17,7 @@ uniform vec4 TimeOfDay;
 uniform vec4 CameraPosition;
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_LightMapTexture);
+SAMPLER2D_AUTOREG(s_BrCausticNoise);
 #if defined(SEASONS)
 SAMPLER2D_AUTOREG(s_SeasonsTexture);
 #endif
@@ -72,9 +74,50 @@ void main() {
     }
 #endif
 
-    diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
     brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
     vec3 relPos = v_worldPosition.xyz - ViewPositionAndTime.xyz;
+    float camDist = length(relPos);
+    vec3 viewDir = relPos/max(camDist, 0.0001);
+
+    // derivatives are taken outside any branch, they are only defined when all pixels of a block run them
+    // the normal of a visible face points toward the camera, which also fixes the sign the winding gives
+    vec3 geoNormal = normalize(cross(dFdx(v_worldPosition.xyz), dFdy(v_worldPosition.xyz)));
+    if (dot(geoNormal, viewDir) > 0.0) {
+        geoNormal = -geoNormal;
+    }
+
+    bool isWater = false;
+#if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS))
+    if (v_water.x > 0.5) {
+        isWater = true;
+        brSkyColor sky = brSkyColors(env);
+
+        // the top face gets the animated waves, the other faces use the normal of the geometry
+        bool top = v_water.y > 0.5;
+        vec3 nrm = geoNormal;
+        if (top) {
+            nrm = brWaterNormal(brWaterCoord(relPos.xz, CameraPosition.xz), ViewPositionAndTime.w, camDist);
+        }
+
+        if (top && viewDir.y > 0.0) {
+            // under the surface: the sky through the water, bent by it, with the sun and moon in it.
+            // Where a roof covers the water the surface turns see-through so the roof stays visible
+            float skyVisible = smoothstep(0.55, 0.95, v_lightmapUV.y);
+            diffuse = vec4(brUnderwaterSurface(viewDir, -nrm, env, sky, skyVisible), mix(0.55, 1.0, skyVisible));
+        } else {
+            diffuse = brWaterAbove(viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky);
+        }
+    }
+#endif
+
+    if (!isWater) {
+        diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
+#if !defined(ALPHA_TEST) && !defined(SEASONS) && !defined(TRANSPARENT)
+        // the moving light pattern on the bottom, only under water in the overworld
+        diffuse.rgb = brCaustics(s_BrCausticNoise, diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
+#endif
+    }
+
     diffuse.rgb = brApplyFog(diffuse.rgb, relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, v_lightmapUV.y, FogAndDistanceControl.z, ViewPositionAndTime.w, env, FogColor.rgb, v_fog.a);
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);

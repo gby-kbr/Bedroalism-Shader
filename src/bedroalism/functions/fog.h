@@ -2,6 +2,7 @@
 #define BR_FOG_H
 
 #include "sky.h"
+#include "underwater.h"
 
 #define BR_SEA_LEVEL 63.0
 
@@ -39,17 +40,14 @@ vec3 brApplyFog(vec3 col, vec3 relPos, vec2 worldXZ, float camY, float skyLight,
   }
   float dist = length(relPos);
   vec3 dir = relPos/max(dist, 0.0001);
-  float open = env.underwater ? 1.0 : smoothstep(0.15, 0.75, skyLight);
-
-  float amount;
   if (env.underwater) {
-    amount = 1.0 - exp(-dist*BR_UNDERWATER_DENSITY);
-  } else {
-    float fog = 1.0 - exp(-brFogOpticalDepth(camY, dir.y, dist, env)*(0.3 + 0.7*open));
-    float mist = brRain(env)*open*brWindMist(worldXZ, t)*BR_RAIN_MIST*smoothstep(0.03, 0.5, dist/max(renderDist, 1.0));
-    amount = 1.0 - (1.0 - fog)*(1.0 - mist);
+    // clear water haze instead of the thick vanilla fog
+    return brUnderwaterFog(col, dist, env, skyLight);
   }
-  amount = max(amount, vanillaFog);
+  float open = smoothstep(0.15, 0.75, skyLight);
+  float fog = 1.0 - exp(-brFogOpticalDepth(camY, dir.y, dist, env)*(0.3 + 0.7*open));
+  float mist = brRain(env)*open*brWindMist(worldXZ, t)*BR_RAIN_MIST*smoothstep(0.03, 0.5, dist/max(renderDist, 1.0));
+  float amount = max(1.0 - (1.0 - fog)*(1.0 - mist), vanillaFog);
   vec3 fogCol = mix(vanillaFogColor, brFogColor(dir, env), open);
   return mix(col, fogCol, amount);
 }

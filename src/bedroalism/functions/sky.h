@@ -18,7 +18,7 @@ float brDawnAmount(brEnvironment env) {
   return d*d*d;
 }
 
-// day, night, dawn, rain and underwater, mixed the way Newb X does
+// day, night, dawn and rain, mixed the way Newb X does
 brSkyColor brSkyColors(brEnvironment env) {
   brSkyColor s;
   float f = 1.0 + 2.0*(1.0 - max(-env.dayFactor, 0.0));
@@ -38,11 +38,6 @@ brSkyColor brSkyColors(brEnvironment env) {
   s.zenith = mix(s.zenith, BR_RAIN_ZENITH_COL*zh, rainMix);
   s.horizon = mix(s.horizon, BR_RAIN_HORIZON_COL*hh, rainMix);
 
-  if (env.underwater) {
-    vec3 water = env.fogCol*env.fogCol*BR_UNDERWATER_TINT;
-    s.zenith = mix(2.0*water, water*zh, 0.8);
-    s.horizon = mix(2.0*water, water*hh, 0.8);
-  }
   return s;
 }
 
@@ -54,6 +49,23 @@ vec3 brRenderSky(brSkyColor s, vec3 viewDir) {
   float gradient = 0.8*vh4*vh4 + 0.2*vh2;
   vec3 sky = mix(s.zenith, s.horizon, gradient);
   return sky*(0.5 + 0.5*gradient);
+}
+
+
+// light below the horizon is gone
+float brGlowVisibility(float lightHeight) {
+  return smoothstep(-0.08, 0.12, lightHeight);
+}
+
+// the sun and moon discs, for reflections and for looking up through the water surface
+// dir: normalized direction of the ray. radiance scales the brightness of each disc
+vec3 brSunMoonDisc(vec3 dir, brEnvironment env, float sunRadiance, float moonRadiance) {
+  float outer = 0.9983; // cos(0.058), the discs of the SunMoon material span about 0.058 rad
+  float inner = 0.9990;
+  vec3 sunCol = mix(vec3(1.15, 1.10, 1.00), vec3(1.50, 0.55, 0.25), env.twilight);
+  float sun = smoothstep(outer, inner, dot(dir, env.sunDir))*brGlowVisibility(env.sunDir.y);
+  float moon = smoothstep(outer, inner, dot(dir, env.moonDir))*brGlowVisibility(env.moonDir.y)*env.night;
+  return sunCol*(sun*sunRadiance) + vec3(0.62, 0.70, 0.90)*(moon*moonRadiance);
 }
 
 #endif
