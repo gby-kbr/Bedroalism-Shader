@@ -18,11 +18,11 @@ vec3 brUnderwaterFog(vec3 col, float dist, brEnvironment env, float skyLight) {
   return col*T + brWaterScatterColor(env, skyLight)*(1.0 - T);
 }
 
-// Looking up through the surface from below. The ray bends when it leaves the water, so the whole sky
-// is squeezed into a circle around straight up, the angle where it ends is asin(1/1.333) = 48.6 degrees.
-// Outside that circle the surface mirrors the water below, shown as the water color.
+// Looking up through the surface from below: the surface keeps the color of the water and only the sun
+// and the moon show through it. The ray bends when it leaves the water, so the discs sit where the
+// refracted ray points. Outside the angle asin(1/1.333) = 48.6 degrees the surface mirrors the water.
 // viewDir: normalized, pointing up. nrm: normal of the surface, pointing down (toward the eye)
-vec3 brUnderwaterSurface(vec3 viewDir, vec3 nrm, brEnvironment env, brSkyColor sky, float skyVisible) {
+vec3 brUnderwaterSurface(vec3 viewDir, vec3 nrm, brEnvironment env, float skyVisible) {
   vec3 scatter = brWaterScatterColor(env, 0.9);
   float eta = 1.333;
   float cosI = clamp(-dot(viewDir, nrm), 0.0, 1.0);
@@ -34,10 +34,9 @@ vec3 brUnderwaterSurface(vec3 viewDir, vec3 nrm, brEnvironment env, brSkyColor s
   vec3 outDir = eta*viewDir + (eta*cosI - cosT)*nrm; // direction of the ray in the air
   outDir = normalize(vec3(outDir.x, max(outDir.y, 0.0), outDir.z));
 
-  float fresnel = brFresnel(cosT, 0.02); // goes to 1.0 at the edge of the circle
-  vec3 skySeen = brSkyRadiance(outDir, env, sky, vec2(8.0, 3.0));
-  vec3 keep = exp(-brUnderwaterAbsorption()*(1.5/max(cosI, 0.2))); // the ray also crossed a little water
-  return mix(skySeen*keep, scatter, fresnel)*skyVisible + scatter*(1.0 - skyVisible);
+  float fresnel = brFresnel(cosT, 0.02);
+  vec3 discs = brSunMoonDisc(outDir, env, 8.0, 3.0)*exp(-brUnderwaterAbsorption()*(1.5/max(cosI, 0.2)))*(1.0 - fresnel);
+  return scatter + discs*skyVisible;
 }
 
 #endif
