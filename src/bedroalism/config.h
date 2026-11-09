@@ -44,7 +44,7 @@
 #define BR_WATER_WAVE_SPEED  0.6  // 0.0 still ~ 2.0 fast
 #define BR_WATER_WAVE_RANGE  48.0 // blocks around the camera where the surface mesh moves
 #define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
-#define BR_CAUSTICS          1.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom, only under water
+#define BR_CAUSTICS          2.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom, only under water
 #define BR_UNDERWATER_DENSITY 1.0 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
 
 #endif
