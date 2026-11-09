@@ -19,4 +19,13 @@
 #define BR_SUN_PATH_TILT   31.0
 #define BR_MOON_PATH_TILT -28.0
 
+
+// Sky colors, linear, from Newb X
+#define BR_DAY_ZENITH_COL    vec3(0.3, 0.9, 2.0)
+#define BR_DAY_HORIZON_COL   vec3(1.0, 1.6, 1.8)
+#define BR_DAWN_ZENITH_COL   vec3(0.1, 0.4, 0.7)
+#define BR_DAWN_HORIZON_COL  vec3(3.0, 0.4, 0.4)
+#define BR_NIGHT_ZENITH_COL  vec3(0.008, 0.048, 0.08)
+#define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
+
 #endif
