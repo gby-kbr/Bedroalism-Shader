@@ -50,4 +50,10 @@
 #define BR_UNDERWATER_DENSITY 0.9 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
 #define BR_UNDERWATER_SURFACE_SMOOTH 0.75 // 0 = full waves, 1 = flat surface seen from below
 
+// Wind
+#define BR_PLANT_WAVE   0.05 // 0.02 gentle ~ 0.2 strong, grass, leaves and vines
+#define BR_LANTERN_WAVE 0.16 // 0.05 subtle ~ 0.4 large swing
+#define BR_WAVE_SPEED   2.0  // 0.5 slow ~ 5.0 fast
+#define BR_WAVE_RANGE   24.0 // 8.0 near ~ 48.0 far, blocks around the camera that move
+
 #endif

@@ -9,6 +9,8 @@ $output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/water.h>
+#include <bedroalism/functions/detection.h>
+#include <bedroalism/functions/wave.h>
 
 uniform vec4 RenderChunkFogAlpha;
 uniform vec4 FogAndDistanceControl;
@@ -16,6 +18,8 @@ uniform vec4 ViewPositionAndTime;
 uniform vec4 FogColor;
 uniform vec4 MeshContext;
 uniform vec4 CameraPosition;
+
+SAMPLER2D_AUTOREG(s_MatTexture);
 
 void main() {
 #ifdef INSTANCING
@@ -34,6 +38,29 @@ void main() {
     color = vec4_splat(1.0);
 #else
     color = a_color0;
+#endif
+
+#if defined(ALPHA_TEST) && !defined(RENDER_AS_BILLBOARDS) && !defined(INSTANCING)
+    float waveDist = length(ViewPositionAndTime.xyz - worldPos);
+    if (waveDist < BR_WAVE_RANGE) {
+        vec3 gPos = worldPos + CameraPosition.xyz;
+        vec3 bPos = fract(a_position.xyz);
+        vec2 uvTile = 2.0 * a_texcoord0.xy;
+        uvTile = fract(uvTile) + ((floor(uvTile) - 0.5) / 16384.0);
+        float texPosY = fract(uvTile.y * float(textureSize(s_MatTexture, 0).y) / 16.0);
+        vec2 light = fract(a_texcoord1.y * vec2(256.0, 4096.0));
+        float rain = brDetectRain(FogAndDistanceControl.xyz);
+        if (brDetectUnderwater(FogColor.rgb, FogAndDistanceControl.xy) || brDetectNether(FogColor.rgb, FogAndDistanceControl.xy)) {
+            rain = 0.0;
+        }
+#ifdef SEASONS
+        bool isTree = true;
+#else
+        bool isTree = (a_color0.r != a_color0.g || a_color0.r != a_color0.b) && (bPos.x + bPos.y + bPos.z < 0.001) || a_color0.a == 0.0;
+#endif
+        brWavePlants(worldPos, gPos, bPos, a_color0, texPosY, light.y*light.y, waveDist, isTree, ViewPositionAndTime.w, rain);
+        brWaveLantern(worldPos, gPos, bPos, texPosY, light.x*light.x, waveDist, ViewPositionAndTime.w, rain);
+    }
 #endif
 
     vec4 fogAndDist = FogAndDistanceControl;
