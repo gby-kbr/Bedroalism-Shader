@@ -101,8 +101,7 @@ void main() {
 
         if (top && viewDir.y > 0.0) {
             // under the surface: as clear as from above, with the sun and moon showing through
-            float skyVisible = smoothstep(0.55, 0.95, v_lightmapUV.y);
-            diffuse = brUnderwaterSurface(viewDir, -nrm, env, skyVisible);
+            diffuse = brUnderwaterSurface(viewDir, -nrm, env);
         } else {
             diffuse = brWaterAbove(viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky);
         }
