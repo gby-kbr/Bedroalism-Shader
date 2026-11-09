@@ -41,7 +41,7 @@
 #define BR_WATER_COLOR       vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
 #define BR_WATER_OPACITY     0.35 // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
 #define BR_WATER_WAVE_HEIGHT 1.0  // 0.0 flat ~ 2.0 rough
-#define BR_WATER_WAVE_SPEED  0.8  // 0.0 still ~ 2.0 fast
+#define BR_WATER_WAVE_SPEED  0.6  // 0.0 still ~ 2.0 fast
 #define BR_WATER_WAVE_RANGE  48.0 // blocks around the camera where the surface mesh moves
 #define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
 #define BR_CAUSTICS          1.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom, only under water
