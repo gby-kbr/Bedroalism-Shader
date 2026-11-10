@@ -23,7 +23,7 @@
 #define BR_DAY_ZENITH_COL    vec3(0.3, 0.9, 2.0)
 #define BR_DAY_HORIZON_COL   vec3(0.5, 1.15, 1.95)
 #define BR_DAWN_ZENITH_COL   vec3(0.12, 0.28, 0.62)
-#define BR_DAWN_HORIZON_COL  vec3(1.7, 0.7, 0.35)
+#define BR_DAWN_HORIZON_COL  vec3(2.2, 0.8, 0.28)
 #define BR_NIGHT_ZENITH_COL  vec3(0.008, 0.048, 0.08)
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
 #define BR_RAIN_ZENITH_COL   vec3(0.47, 0.51, 0.56)

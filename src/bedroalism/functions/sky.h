@@ -33,6 +33,7 @@ brSkyColor brSkyColors(brEnvironment env) {
   float dawnFactor = 1.0 - env.dayFactor*env.dayFactor;
   dawnFactor *= dawnFactor*dawnFactor;
   dawnFactor *= mix(1.0, dawnFactor*dawnFactor, nightFactor);
+  dawnFactor *= 1.0 - 0.4*smoothstep(0.0, -0.25, env.dayFactor); // weaker once the sun is gone
   dawnFactor *= BR_DAWN_AMOUNT;
   s.zenith = mix(s.zenith, BR_DAWN_ZENITH_COL, dawnFactor);
 
@@ -42,7 +43,9 @@ brSkyColor brSkyColors(brEnvironment env) {
   s.zenith = mix(s.zenith, BR_RAIN_ZENITH_COL*zh, rainMix);
   s.baseHorizon = mix(s.baseHorizon, BR_RAIN_HORIZON_COL*hh, rainMix);
 
-  s.dawnHorizon = BR_DAWN_HORIZON_COL;
+  // orange while the sun is at the horizon, a faded tone after it has gone
+  vec3 faded = mix(BR_DAWN_HORIZON_COL, vec3_splat(dot(BR_DAWN_HORIZON_COL, vec3_splat(0.33))), 0.45);
+  s.dawnHorizon = mix(faded, BR_DAWN_HORIZON_COL, smoothstep(-0.06, 0.10, env.dayFactor));
   s.dawn = dawnFactor*(1.0 - rainMix);
   s.sunDir = env.sunDir;
   s.horizon = mix(s.baseHorizon, s.dawnHorizon, s.dawn*0.4);
