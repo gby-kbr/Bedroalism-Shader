@@ -28,7 +28,7 @@
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
 #define BR_RAIN_ZENITH_COL   vec3(0.47, 0.51, 0.56)
 #define BR_RAIN_HORIZON_COL  vec3(0.6, 0.6, 0.6)
-#define BR_DAWN_AMOUNT       0.65 // 0.0 no dawn color ~ 1.0 the dawn color takes over the whole horizon
+#define BR_DAWN_AMOUNT       1.0  // 0.0 no dawn color ~ 1.0 full dawn color, it only shows around the sun
 #define BR_SKY_RAIN_MIX      1.0 // 0.0 no change ~ 1.0 fully overcast in rain
 
 // Fog, overworld only

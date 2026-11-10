@@ -5,7 +5,11 @@
 
 struct brSkyColor {
   vec3 zenith;
-  vec3 horizon;
+  vec3 horizon;      // the horizon with an average amount of dawn, for the ambient light of the clouds
+  vec3 baseHorizon;  // day, night and rain only
+  vec3 dawnHorizon;
+  float dawn;        // [0.0, 1.0] how much dawn there is, it only reaches the horizon near the sun
+  vec3 sunDir;
 };
 
 // detection reports full rain under water and in the Nether, so it is masked here
@@ -22,23 +26,26 @@ float brDawnAmount(brEnvironment env) {
 brSkyColor brSkyColors(brEnvironment env) {
   brSkyColor s;
   float f = 1.0 + 2.0*(1.0 - max(-env.dayFactor, 0.0));
-  float nightFactor = step(env.dayFactor, 0.0);
+  float nightFactor = 1.0 - smoothstep(-0.12, 0.12, env.dayFactor); // a soft change, a hard step jumps at sunset
   s.zenith = mix(BR_DAY_ZENITH_COL, BR_NIGHT_ZENITH_COL*f, nightFactor);
-  s.horizon = mix(BR_DAY_HORIZON_COL, BR_NIGHT_HORIZON_COL*f, nightFactor);
+  s.baseHorizon = mix(BR_DAY_HORIZON_COL, BR_NIGHT_HORIZON_COL*f, nightFactor);
 
   float dawnFactor = 1.0 - env.dayFactor*env.dayFactor;
   dawnFactor *= dawnFactor*dawnFactor;
   dawnFactor *= mix(1.0, dawnFactor*dawnFactor, nightFactor);
   dawnFactor *= BR_DAWN_AMOUNT;
   s.zenith = mix(s.zenith, BR_DAWN_ZENITH_COL, dawnFactor);
-  s.horizon = mix(s.horizon, BR_DAWN_HORIZON_COL, dawnFactor);
 
   float zh = dot(s.zenith, vec3_splat(0.33));
-  float hh = dot(s.horizon, vec3_splat(0.33));
+  float hh = dot(s.baseHorizon, vec3_splat(0.33));
   float rainMix = brRain(env)*BR_SKY_RAIN_MIX;
   s.zenith = mix(s.zenith, BR_RAIN_ZENITH_COL*zh, rainMix);
-  s.horizon = mix(s.horizon, BR_RAIN_HORIZON_COL*hh, rainMix);
+  s.baseHorizon = mix(s.baseHorizon, BR_RAIN_HORIZON_COL*hh, rainMix);
 
+  s.dawnHorizon = BR_DAWN_HORIZON_COL;
+  s.dawn = dawnFactor*(1.0 - rainMix);
+  s.sunDir = env.sunDir;
+  s.horizon = mix(s.baseHorizon, s.dawnHorizon, s.dawn*0.4);
   return s;
 }
 
@@ -46,7 +53,9 @@ brSkyColor brSkyColors(brEnvironment env) {
 vec3 brRenderSky(brSkyColor s, vec3 viewDir) {
   float vh = 1.0 - viewDir.y*viewDir.y;
   float gradient = vh*vh*vh; // a long soft fade from the horizon to the zenith
-  vec3 sky = mix(s.zenith, s.horizon, gradient);
+  float nearSun = smoothstep(-0.2, 0.9, dot(viewDir, s.sunDir)); // dawn color only around the sun
+  vec3 horizon = mix(s.baseHorizon, s.dawnHorizon, s.dawn*nearSun);
+  vec3 sky = mix(s.zenith, horizon, gradient);
   return sky*(0.5 + 0.3*gradient);
 }
 
