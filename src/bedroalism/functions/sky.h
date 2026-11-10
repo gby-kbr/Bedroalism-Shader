@@ -68,14 +68,20 @@ float brGlowVisibility(float lightHeight) {
   return smoothstep(-0.08, 0.12, lightHeight);
 }
 
+// angular radius of the visible disc inside the sun and moon quad, for size 1.0
+#define BR_SUNMOON_DISC_RADIUS 0.0583
+
 // the sun and moon discs, for reflections and for looking up through the water surface
 // dir: normalized direction of the ray. radiance scales the brightness of each disc
 vec3 brSunMoonDisc(vec3 dir, brEnvironment env, float sunRadiance, float moonRadiance) {
-  float outer = 0.9983; // cos(0.058), the discs of the SunMoon material span about 0.058 rad
-  float inner = 0.9990;
+  // the visible disc scales with the size of the quad, the soft edge is the same share of it
+  float sunOuter = cos(BR_SUNMOON_DISC_RADIUS*BR_SUN_SIZE);
+  float sunInner = cos(BR_SUNMOON_DISC_RADIUS*BR_SUN_SIZE*0.767);
+  float moonOuter = cos(BR_SUNMOON_DISC_RADIUS*BR_MOON_SIZE);
+  float moonInner = cos(BR_SUNMOON_DISC_RADIUS*BR_MOON_SIZE*0.767);
   vec3 sunCol = mix(vec3(1.15, 1.10, 1.00), vec3(1.50, 0.55, 0.25), env.twilight);
-  float sun = smoothstep(outer, inner, dot(dir, env.sunDir))*brGlowVisibility(env.sunDir.y);
-  float moon = smoothstep(outer, inner, dot(dir, env.moonDir))*brGlowVisibility(env.moonDir.y)*env.night;
+  float sun = smoothstep(sunOuter, sunInner, dot(dir, env.sunDir))*brGlowVisibility(env.sunDir.y);
+  float moon = smoothstep(moonOuter, moonInner, dot(dir, env.moonDir))*brGlowVisibility(env.moonDir.y)*env.night;
   return sunCol*(sun*sunRadiance) + vec3(0.62, 0.70, 0.90)*(moon*moonRadiance);
 }
 
