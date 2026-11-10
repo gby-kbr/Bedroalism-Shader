@@ -61,9 +61,7 @@
 #define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
 
 // Shadows
-#define BR_SHADOW             0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
-#define BR_SIDE_SHADOW        0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
-#define BR_SHADOW_OUTDOOR_MIN 0.45 // sky light where the shadows start to show
-#define BR_SHADOW_OUTDOOR_MAX 0.70 // sky light from which they are full, lower inside a room
+#define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
+#define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 #endif
