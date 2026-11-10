@@ -29,6 +29,7 @@ brSkyColor brSkyColors(brEnvironment env) {
   float dawnFactor = 1.0 - env.dayFactor*env.dayFactor;
   dawnFactor *= dawnFactor*dawnFactor;
   dawnFactor *= mix(1.0, dawnFactor*dawnFactor, nightFactor);
+  dawnFactor *= BR_DAWN_AMOUNT;
   s.zenith = mix(s.zenith, BR_DAWN_ZENITH_COL, dawnFactor);
   s.horizon = mix(s.horizon, BR_DAWN_HORIZON_COL, dawnFactor);
 
