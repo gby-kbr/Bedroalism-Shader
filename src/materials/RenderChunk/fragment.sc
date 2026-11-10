@@ -5,6 +5,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/colorcorrection.h>
 #include <bedroalism/functions/fog.h>
 #include <bedroalism/functions/caustics.h>
+#include <bedroalism/functions/puddles.h>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 
 uniform vec4 FogColor;
@@ -117,6 +118,14 @@ void main() {
         float shadow = (1.0 - smoothstep(0.860, 0.875, v_lightmapUV.y*v_lightmapUV.y))*(1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0))*sunlit;
         float sideShadow = step(0.9, abs(geoNormal.x))*sunlit*(1.0 - shadow); // the whole side face, not over the first shadow
         diffuse.rgb *= (1.0 - BR_SHADOW*shadow)*(1.0 - BR_SIDE_SHADOW*sideShadow);
+
+        // rain wets open ground, flat ground gets puddles with rings of drops (not on leaves and plants)
+#if defined(ALPHA_TEST) || defined(SEASONS) || defined(TRANSPARENT)
+        const bool wetOpaque = false;
+#else
+        const bool wetOpaque = true;
+#endif
+        diffuse.rgb = brWetSurface(diffuse.rgb, relPos + CameraPosition.xyz, geoNormal, viewDir, v_lightmapUV.y, wetOpaque, ViewPositionAndTime.w, env);
 
 #if !defined(ALPHA_TEST) && !defined(SEASONS) && !defined(TRANSPARENT)
         // the moving light pattern on the bottom, only under water in the overworld

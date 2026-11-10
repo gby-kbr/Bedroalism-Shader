@@ -41,7 +41,7 @@ brSkyColor brSkyColors(brEnvironment env) {
   float hh = dot(s.baseHorizon, vec3_splat(0.33));
   float rainMix = brRain(env)*BR_SKY_RAIN_MIX;
   s.zenith = mix(s.zenith, BR_RAIN_ZENITH_COL*zh, rainMix);
-  s.baseHorizon = mix(s.baseHorizon, BR_RAIN_HORIZON_COL*hh, rainMix);
+  s.baseHorizon = mix(s.baseHorizon, BR_RAIN_HORIZON_COL*mix(hh, zh, 0.7), rainMix); // not brighter than the zenith
 
   // orange while the sun is at the horizon, a faded tone after it has gone
   vec3 faded = mix(BR_DAWN_HORIZON_COL, vec3_splat(dot(BR_DAWN_HORIZON_COL, vec3_splat(0.33))), 0.45);

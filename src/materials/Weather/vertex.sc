@@ -3,9 +3,11 @@ $input a_position, a_color0, a_texcoord0
     $input i_data1, i_data2, i_data3
 #endif
 
-$output v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldPos
+$output v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldPos, v_local
 
 #include <bgfx_shader.sh>
+#include <bedroalism/config.h>
+#include <bedroalism/functions/wave.h>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
 
@@ -17,6 +19,7 @@ uniform vec4 PositionForwardOffset;
 uniform vec4 UVOffsetAndScale;
 uniform vec4 Velocity;
 uniform vec4 ViewPosition;
+uniform vec4 ViewPositionAndTime;
 
 #if BGFX_SHADER_LANGUAGE_GLSL
     #if BGFX_SHADER_LANGUAGE_GLSL < 130
@@ -40,8 +43,23 @@ void main() {
     worldSpacePosition -= particleBox * 0.5;
     worldSpacePosition += PositionForwardOffset.xyz;
 
+    bool isRain = (UVOffsetAndScale.w > 3.8 * UVOffsetAndScale.z) && Dimensions.x < 0.1;
+    vec3 velocity = Velocity.xyz;
+    vec2 dimensions = Dimensions.xy;
+    if (isRain) {
+        // thin streaks, blown a little along the wind: the drops fall along their own streak
+        dimensions.x *= BR_RAIN_WIDTH;
+        vec2 slant = BR_WIND_DIR * BR_RAIN_SLANT;
+        worldSpacePosition.xz -= worldSpacePosition.y * slant;
+        velocity.xz = slant * -velocity.y;
+    } else {
+        // snow drifts from side to side while it falls
+        float t = ViewPositionAndTime.w;
+        worldSpacePosition.xz += 0.25 * vec2(sin(t * 0.9 + worldSpacePosition.y * 0.6 + worldSpacePosition.z), cos(t * 0.7 + worldSpacePosition.y * 0.5 + worldSpacePosition.x));
+    }
+
     vec3 worldSpacePositionBottom = worldSpacePosition;
-    vec3 worldSpacePositionTop = worldSpacePositionBottom + (Velocity.xyz * Dimensions.y);
+    vec3 worldSpacePositionTop = worldSpacePositionBottom + (velocity * dimensions.y);
 
     vec4 screenSpacePositionBottom = jitterVertexPosition(worldSpacePositionBottom);
     vec4 screenSpacePositionTop = jitterVertexPosition(worldSpacePositionTop);
@@ -50,7 +68,7 @@ void main() {
     vec2 screenSpaceRightDirection = normalize(vec2(-screenSpaceUpDirection.y, screenSpaceUpDirection.x));
 
     vec4 position = mix(screenSpacePositionTop, screenSpacePositionBottom, a_texcoord0.y);
-    position.xy += (0.5 - a_texcoord0.x) * screenSpaceRightDirection * Dimensions.x;
+    position.xy += (0.5 - a_texcoord0.x) * screenSpaceRightDirection * dimensions.x;
 
     vec2 occlusionUV = ((worldSpacePosition.xz + ViewPosition.xz) * (1.0 / 64.0)) + vec2_splat(0.5);
     float occlusionHeight = (worldSpacePosition.y + ViewPosition.y - 0.5) * (1.0 / 255.0);
@@ -64,5 +82,6 @@ void main() {
     v_occlusionUV = occlusionUV;
     v_texcoord0 = texcoord0;
     v_worldPos = worldSpacePosition;
+    v_local = vec3(a_texcoord0, isRain ? 1.0 : 0.0);
     gl_Position = position;
 }

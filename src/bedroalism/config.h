@@ -28,10 +28,18 @@
 #define BR_DAWN_HORIZON_COL  vec3(1.85, 1.3, 0.9)
 #define BR_NIGHT_ZENITH_COL  vec3(0.008, 0.048, 0.08)
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
-#define BR_RAIN_ZENITH_COL   vec3(0.47, 0.51, 0.56)
-#define BR_RAIN_HORIZON_COL  vec3(0.6, 0.6, 0.6)
+#define BR_RAIN_ZENITH_COL   vec3(0.52, 0.50, 0.59)
+#define BR_RAIN_HORIZON_COL  vec3(0.56, 0.54, 0.62)
 #define BR_DAWN_AMOUNT       1.0  // 0.0 no dawn color ~ 1.0 full dawn color, it only shows around the sun
 #define BR_SKY_RAIN_MIX      1.0 // 0.0 no change ~ 1.0 fully overcast in rain
+
+// Rain and snow
+#define BR_RAIN_WIDTH   0.5  // 0.2 hair thin ~ 1.0 as wide as vanilla, width of the rain streaks
+#define BR_RAIN_OPACITY 0.5  // 0.0 invisible ~ 1.0 solid, how see-through the streaks are
+#define BR_RAIN_SLANT   0.12 // 0.0 straight down ~ 0.4 blown by the wind
+#define BR_PUDDLES      1.0  // 0.0 none ~ 1.0 many, puddles on open flat ground in rain
+#define BR_RAIN_SPLASH  1.0  // 0.0 none ~ 2.0 strong, rings in the puddles and drops on wet ground
+#define BR_WET_DARKEN   0.3  // 0.0 none ~ 0.6 dark, how much wet surfaces darken in rain
 
 // Fog, overworld only
 #define BR_FOG_DENSITY 0.003  // 0.0015 thin ~ 0.012 thick, light lost per block at sea level

@@ -1,4 +1,4 @@
-$input v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldPos
+$input v_color0, v_fog, v_occlusionHeight, v_occlusionUV, v_texcoord0, v_worldPos, v_local
 
 #include <bgfx_shader.sh>
 #include <bedroalism/config.h>
@@ -54,6 +54,12 @@ void main() {
         vec2 lightingUV = vec2(uvX, 1.0);
         vec3 light = texture2D(s_LightingTexture, lightingUV).rgb;
         diffuse.rgb *= light;
+        if (v_local.z > 0.5) {
+            diffuse.a *= BR_RAIN_OPACITY; // rain is mostly see-through
+        } else {
+            vec2 c = v_local.xy * 2.0 - 1.0;
+            diffuse.a *= 1.0 - smoothstep(0.35, 1.0, dot(c, c)); // soft round snowflakes
+        }
         brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
         vec3 camPos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz;
         vec3 relPos = v_worldPos - camPos;
