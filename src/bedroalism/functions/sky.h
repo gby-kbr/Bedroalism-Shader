@@ -44,11 +44,9 @@ brSkyColor brSkyColors(brEnvironment env) {
 // viewDir: normalized, y up
 vec3 brRenderSky(brSkyColor s, vec3 viewDir) {
   float vh = 1.0 - viewDir.y*viewDir.y;
-  float vh2 = vh*vh;
-  float vh4 = vh2*vh2;
-  float gradient = 0.8*vh4*vh4 + 0.2*vh2;
+  float gradient = vh*vh*vh; // a long soft fade from the horizon to the zenith
   vec3 sky = mix(s.zenith, s.horizon, gradient);
-  return sky*(0.5 + 0.5*gradient);
+  return sky*(0.5 + 0.3*gradient);
 }
 
 
