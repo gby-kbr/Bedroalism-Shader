@@ -18,6 +18,7 @@ uniform vec4 CameraPosition;
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_LightMapTexture);
 SAMPLER2D_AUTOREG(s_BrCausticNoise);
+SAMPLER2D_AUTOREG(s_BrCloudNoise);
 #if defined(SEASONS)
 SAMPLER2D_AUTOREG(s_SeasonsTexture);
 #endif
@@ -103,7 +104,7 @@ void main() {
             // under the surface: as clear as from above, with the sun and moon showing through
             diffuse = brUnderwaterSurface(viewDir, -nrm, env);
         } else {
-            diffuse = brWaterAbove(viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky);
+            diffuse = brWaterAbove(viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky, s_BrCloudNoise, ViewPositionAndTime.w);
         }
     }
 #endif

@@ -1,7 +1,7 @@
 #ifndef BR_WATER_H
 #define BR_WATER_H
 
-#include "sky.h"
+#include "clouds.h"
 #include "utils.h"
 
 // ---------------------------------------------------------------------------------------------
@@ -80,10 +80,12 @@ vec3 brWaterScatterColor(brEnvironment env, float skyLight) {
   return BR_WATER_COLOR*(brWaterLightLevel(env)*(0.12 + 0.88*skyLight*skyLight));
 }
 
-// everything the sky shows in one direction: gradient and the sun and moon discs
+// everything the sky shows in one direction: gradient, sun and moon discs, and the clouds in front of them
 // discRadiance: x sun, y moon, 0.0 hides the discs
-vec3 brSkyRadiance(vec3 dir, brEnvironment env, brSkyColor sky, vec2 discRadiance) {
-  return brRenderSky(sky, dir) + brSunMoonDisc(dir, env, discRadiance.x, discRadiance.y);
+vec3 brSkyRadiance(vec3 dir, brEnvironment env, brSkyColor sky, vec2 discRadiance, sampler2D cloudTex, float time) {
+  vec4 clouds = brClouds(cloudTex, dir, env, sky, time);
+  vec3 behind = brRenderSky(sky, dir) + brSunMoonDisc(dir, env, discRadiance.x, discRadiance.y)*(1.0 - clouds.a);
+  return mix(behind, clouds.rgb, clouds.a);
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -93,14 +95,14 @@ vec3 brSkyRadiance(vec3 dir, brEnvironment env, brSkyColor sky, vec2 discRadianc
 // color and opacity of a water fragment seen from above, to be blended over what is behind it
 // viewDir: from the camera to the fragment, normalized. nrm: normal facing the camera
 // skyLight, blockLight: lightmap of the fragment. biomeTint: vanilla water color, only tints a little
-vec4 brWaterAbove(vec3 viewDir, vec3 nrm, vec2 lightmap, vec3 biomeTint, brEnvironment env, brSkyColor sky) {
+vec4 brWaterAbove(vec3 viewDir, vec3 nrm, vec2 lightmap, vec3 biomeTint, brEnvironment env, brSkyColor sky, sampler2D cloudTex, float time) {
   float cosV = clamp(-dot(viewDir, nrm), 0.0, 1.0);
   float fresnel = brFresnel(cosV, 0.02);
 
   // reflection: a reflected ray that would go below the horizon is held at the horizon
   vec3 refl = viewDir + 2.0*cosV*nrm;
   refl = normalize(vec3(refl.x, max(refl.y, 0.0), refl.z));
-  vec3 skyRefl = brSkyRadiance(refl, env, sky, vec2(40.0, 6.0)*BR_WATER_SUN_GLITTER);
+  vec3 skyRefl = brSkyRadiance(refl, env, sky, vec2(40.0, 6.0)*BR_WATER_SUN_GLITTER, cloudTex, time);
   skyRefl *= mix(0.05, 1.0, smoothstep(0.35, 0.9, lightmap.y)); // nothing of the sky in the shade
 
   // body: the longer the path through the water, the more it hides what is behind

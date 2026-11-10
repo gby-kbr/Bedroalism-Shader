@@ -16,7 +16,7 @@ void main() {
     vec3 dir = normalize(v_worldPos);
     brSkyColor skyColors = brSkyColors(env);
     vec3 sky = brRenderSky(skyColors, dir);
-    if (env.overworld && !env.underwater) {
+    if (env.overworld) {
         vec4 clouds = brClouds(s_BrCloudNoise, dir, env, skyColors, v_time.x);
         sky = mix(sky, clouds.rgb, clouds.a);
     }
