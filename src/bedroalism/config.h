@@ -36,7 +36,7 @@
 // Rain and snow
 #define BR_RAIN_WIDTH   0.5  // 0.2 hair thin ~ 1.0 as wide as vanilla, width of the rain streaks
 #define BR_RAIN_OPACITY 0.5  // 0.0 invisible ~ 1.0 solid, how see-through the streaks are
-#define BR_RAIN_SLANT   0.12 // 0.0 straight down ~ 0.4 blown by the wind
+#define BR_RAIN_SLANT   0.1  // 0.0 straight down ~ 0.4 blown by the wind
 #define BR_PUDDLES      1.0  // 0.0 none ~ 1.0 many, puddles on open flat ground in rain
 #define BR_RAIN_SPLASH  1.0  // 0.0 none ~ 2.0 strong, rings in the puddles and drops on wet ground
 #define BR_WET_DARKEN   0.3  // 0.0 none ~ 0.6 dark, how much wet surfaces darken in rain
