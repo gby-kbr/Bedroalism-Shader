@@ -113,7 +113,7 @@ void main() {
         diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
 
         // lightmap shadows, only in the overworld daytime and only where sky light reaches
-        float sunlit = smoothstep(0.45, 0.70, v_lightmapUV.y)*(1.0 - env.night)*(env.overworld && !env.underwater ? 1.0 : 0.0);
+        float sunlit = smoothstep(0.45, 0.70, v_lightmapUV.y)*(1.0 - env.night)*(1.0 - env.rainFactor)*(env.overworld && !env.underwater ? 1.0 : 0.0);
         float shadow = (1.0 - smoothstep(0.860, 0.875, v_lightmapUV.y*v_lightmapUV.y))*(1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0))*sunlit;
         float sideShadow = step(0.9, abs(geoNormal.x))*sunlit*(1.0 - shadow); // the whole side face, not over the first shadow
         diffuse.rgb *= (1.0 - BR_SHADOW*shadow)*(1.0 - BR_SIDE_SHADOW*sideShadow);
