@@ -5,6 +5,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/functions/colorcorrection.h>
 #include <bedroalism/functions/fog.h>
 #include <bedroalism/functions/caustics.h>
+#include <bedroalism/functions/shadow.h>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
 
 uniform vec4 FogColor;
@@ -111,6 +112,7 @@ void main() {
 
     if (!isWater) {
         diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
+        diffuse.rgb *= brShadowFactor(v_lightmapUV, geoNormal, env);
 #if !defined(ALPHA_TEST) && !defined(SEASONS) && !defined(TRANSPARENT)
         // the moving light pattern on the bottom, only under water in the overworld
         diffuse.rgb = brCaustics(s_BrCausticNoise, diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
