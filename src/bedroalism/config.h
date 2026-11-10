@@ -56,4 +56,8 @@
 #define BR_WAVE_SPEED   2.0  // 0.5 slow ~ 5.0 fast
 #define BR_WAVE_RANGE   24.0 // 8.0 near ~ 48.0 far, blocks around the camera that move
 
+// Clouds
+#define BR_CLOUD_COVER 0.5  // 0.0 clear ~ 1.0 overcast, how much of the sky the clouds cover
+#define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
+
 #endif

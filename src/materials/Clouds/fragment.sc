@@ -1,9 +1,8 @@
 $input v_color0, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
-#include <bedroalism/config.h>
-#include <bedroalism/functions/colorcorrection.h>
 
+// The clouds are drawn in the Sky material (see bedroalism/functions/clouds.h), so the blocky ones are dropped
 void main() {
-    gl_FragColor = vec4(brColorCorrection(v_color0.rgb), v_color0.a);
+    discard;
 }
