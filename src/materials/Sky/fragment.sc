@@ -4,8 +4,10 @@ $input v_color0, v_texcoord0, v_time, v_worldPos
 #include <bedroalism/config.h>
 #include <bedroalism/functions/colorcorrection.h>
 #include <bedroalism/functions/clouds.h>
+#include <bedroalism/functions/stars.h>
 
 SAMPLER2D_AUTOREG(s_BrCloudNoise);
+SAMPLER2D_AUTOREG(s_BrStarMap);
 
 uniform vec4 FogColor;
 uniform vec4 FogAndDistanceControl;
@@ -17,6 +19,7 @@ void main() {
     brSkyColor skyColors = brSkyColors(env);
     vec3 sky = brRenderSky(skyColors, dir);
     if (env.overworld) {
+        sky += brStars(s_BrStarMap, dir, env); // under the clouds
         vec4 clouds = brClouds(s_BrCloudNoise, dir, env, skyColors, v_time.x);
         sky = mix(sky, clouds.rgb, clouds.a);
     }
