@@ -76,7 +76,9 @@
 #define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 // Night
-#define BR_NIGHT_DARKNESS 0.85 // 0.0 vanilla ~ 1.0 zero ambient at night, torch light is kept
+#define BR_NIGHT_DARKNESS 1.0  // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept
+#define BR_MOONLIGHT      0.10 // 0.0 none ~ 1.0 full, brightness left under the open night sky
+#define BR_MOONLIGHT_COL  vec3(0.62, 0.78, 1.1) // tint of the moonlit surfaces
 
 // Stars
 #define BR_STAR_BRIGHTNESS 1.5 // 0.0 off ~ 2.0 bright, how bright the stars are
