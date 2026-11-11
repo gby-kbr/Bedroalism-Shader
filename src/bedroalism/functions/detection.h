@@ -19,7 +19,7 @@ struct brEnvironment {
 };
 
 bool brDetectEnd(vec3 FOG_COLOR) {
-  // fog color is set to #400040 in fogs/the_end_fog_setting.json
+  // fog color is set to #260026 in fogs/the_end_fog_setting.json
   return FOG_COLOR.r==FOG_COLOR.b && (FOG_COLOR.r-FOG_COLOR.g>0.24 || (FOG_COLOR.g==0.0 && FOG_COLOR.r>0.1));
 }
 
