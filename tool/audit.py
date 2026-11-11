@@ -75,6 +75,18 @@ def run(console: Console) -> list:
         if os.path.normpath(h) not in included:
             errors.append(f"header {os.path.relpath(h, SRC_PATH)} is not included anywhere")
 
+    # HLSL has no vecN(scalar), use vecN_splat(scalar), GLSL and Metal accept it so only Windows would fail
+    for f, t in text.items():
+        for m in re.finditer(r"\bvec[234]\s*\(", t):
+            depth, i, comma = 1, m.end(), False
+            while depth and i < len(t):
+                depth += (t[i] == "(") - (t[i] == ")")
+                comma = comma or (t[i] == "," and depth == 1)
+                i += 1
+            if not comma:
+                line = t.count("\n", 0, m.start()) + 1
+                errors.append(f"{os.path.relpath(f, SRC_PATH)}:{line} {t[m.start():i]} has one argument, use the _splat version (HLSL)")
+
     # materials: every folder is listed in project.json and complete
     with open(os.path.join(PROJECT_PATH, "project.json")) as f:
         listed = json.load(f)["base_profile"]["include_patterns"]

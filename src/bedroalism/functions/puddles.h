@@ -9,7 +9,7 @@ float brRainRing(vec2 p, float t, float cells, float rate) {
   vec2 cell = floor(q);
   float h = brHash(cell);
   float phase = fract(t*rate + h*7.0);
-  vec2 centre = vec2(0.5) + 0.3*vec2(brHash(cell + 11.0) - 0.5, brHash(cell + 23.0) - 0.5);
+  vec2 centre = vec2_splat(0.5) + 0.3*vec2(brHash(cell + 11.0) - 0.5, brHash(cell + 23.0) - 0.5);
   float d = length(fract(q) - centre);
   float radius = phase*0.5;
   float ring = smoothstep(0.07, 0.0, abs(d - radius))*(1.0 - phase)*(1.0 - phase);
