@@ -20,7 +20,6 @@ def main():
     check_p.set_defaults(func=check.run)
 
     build_p = sub.add_parser("build", help="compile material.bin and pack the .mcpack")
-    build_p.add_argument("-v", default="", help="patch version number of the pack, eg: 3")
     build_p.add_argument("--no-zip", action="store_true", help="only make the pack folder")
     build_p.set_defaults(func=pack.run)
 

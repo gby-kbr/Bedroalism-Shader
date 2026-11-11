@@ -10,7 +10,7 @@ Needs Python 3.11+ and `pip install -r requirements.txt`. The build tool lives i
 | --- | --- |
 | `build setup` | downloads shaderc and the source materials into `tool/data` (once) |
 | `build check` | audits the sources and test compiles every material, makes no files |
-| `build build [-v PATCH] [--no-zip]` | compiles `material.bin` for all platforms and packs `build/Bedroalism-Shader-v<version>.mcpack` |
+| `build build [--no-zip]` | compiles `material.bin` for all platforms and packs `build/Bedroalism-Shader-v<version>.mcpack`, the version comes from `mcpack/manifest.json` |
 
 Use `./build.sh` on Linux, macOS and Termux, and `build.bat` on Windows.
 
@@ -21,7 +21,7 @@ Windows (HLSL) shaders can only be compiled by the Windows shaderc, so `build` n
 tests Android and iOS only. The GitHub workflows run on Windows:
 
 - **build-check** runs `check` on every push and pull request to `main`.
-- **build** (run manually, optional patch version) runs `check` and `build` and uploads the `.mcpack`.
+- **build** (run manually) runs `check` and `build` and uploads the plain `.mcpack` file, not wrapped in a zip.
 
 ## Layout
 

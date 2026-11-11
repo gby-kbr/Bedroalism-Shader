@@ -10,7 +10,8 @@ console = Console()
 
 
 def run(args):
-    """Build: compile the materials into material.bin and pack them with mcpack/ into a .mcpack."""
+    """Build: compile the materials into material.bin and pack them with mcpack/ into a .mcpack.
+    The version comes from mcpack/manifest.json."""
     if not CAN_BUILD_ALL:
         console.print("Error: the multiplatform build needs Windows, the HLSL shaders cannot be compiled on this system.", style="bold red")
         console.print("       Use the GitHub workflow or a Windows machine. `check` still works here for Android and iOS.", style="red")
@@ -37,11 +38,6 @@ def run(args):
 
     with open(os.path.join(MCPACK_PATH, "manifest.json"), encoding="utf-8") as f:
         manifest = json.load(f)
-    if args.v:
-        if not args.v.isdigit():
-            console.print(f"Invalid version number '{args.v}', use the patch number, eg: 3", style="bold red")
-            exit(1)
-        manifest["header"]["version"][2] = int(args.v)
     version = ".".join(str(n) for n in manifest["header"]["version"])
     name = manifest["header"]["name"].replace(" ", "-")
 

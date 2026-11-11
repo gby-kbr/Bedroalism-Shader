@@ -2,11 +2,6 @@ name: build
 
 on:
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Patch version of the pack (eg: 3), empty uses mcpack/manifest.json'
-        required: false
-        type: string
 
 jobs:
   multiplatform:
@@ -24,11 +19,8 @@ jobs:
     - run: pip install -r requirements.txt
     - run: .\build.bat setup
     - run: .\build.bat check
-    - if: ${{ inputs.version == '' }}
-      run: .\build.bat build
-    - if: ${{ inputs.version != '' }}
-      run: .\build.bat build -v ${{ inputs.version }}
-    - uses: actions/upload-artifact@v4
+    - run: .\build.bat build
+    - uses: actions/upload-artifact@v7
       with:
-        name: bedroalism-shader-multiplatform
         path: build/*.mcpack
+        archive: false # the plain .mcpack file, not a zip around it
