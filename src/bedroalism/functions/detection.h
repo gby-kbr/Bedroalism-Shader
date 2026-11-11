@@ -19,8 +19,9 @@ struct brEnvironment {
 };
 
 bool brDetectEnd(vec3 FOG_COLOR) {
-  // fog color is set to #260026 in fogs/the_end_fog_setting.json
-  return FOG_COLOR.r==FOG_COLOR.b && (FOG_COLOR.r-FOG_COLOR.g>0.24 || (FOG_COLOR.g==0.0 && FOG_COLOR.r>0.1));
+  // fog color is set to #DDDFA5 (end stone) in fogs/the_end_fog_setting.json, no other dimension has it
+  vec3 d = abs(FOG_COLOR - BR_END_FOG_COL);
+  return max(max(d.r, d.g), d.b) < 0.006;
 }
 
 bool brDetectNether(vec3 FOG_COLOR, vec2 FOG_CONTROL) {

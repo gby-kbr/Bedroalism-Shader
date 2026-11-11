@@ -75,6 +75,9 @@
 #define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
 #define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
+// End
+#define BR_END_FOG_COL vec3(0.867, 0.875, 0.647) // must match fog_color #DDDFA5 in mcpack/fogs/the_end_fog_setting.json, it also detects the End
+
 // Night
 #define BR_NIGHT_DARKNESS 0.9 // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept
 #define BR_MOONLIGHT      0.10 // 0.0 none ~ 1.0 full, brightness left under the open night sky
