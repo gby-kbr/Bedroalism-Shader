@@ -1,0 +1,34 @@
+name: build
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Patch version of the pack (eg: 3), empty uses mcpack/manifest.json'
+        required: false
+        type: string
+
+jobs:
+  multiplatform:
+    runs-on: windows-2022
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'pip'
+    - uses: actions/cache@v4
+      with:
+        key: env-files-win-laz
+        path: tool/data
+    - run: pip install -r requirements.txt
+    - run: .\build.bat setup
+    - run: .\build.bat check
+    - if: ${{ inputs.version == '' }}
+      run: .\build.bat build
+    - if: ${{ inputs.version != '' }}
+      run: .\build.bat build -v ${{ inputs.version }}
+    - uses: actions/upload-artifact@v4
+      with:
+        name: bedroalism-shader-multiplatform
+        path: build/*.mcpack

@@ -70,3 +70,7 @@ Testing/
 __pycache__/
 *.py[cod]
 *.mcpack
+
+# build tool downloads
+tool/data/
+tool/lib/

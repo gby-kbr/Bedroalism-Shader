@@ -50,10 +50,6 @@ float brDetectRain(vec3 FOG_CONTROL) {
   return val*val*(3.0 - 2.0*val);
 }
 
-float brDetectDayFactor(vec3 FOG_COLOR) {
-  return min(dot(FOG_COLOR, vec3(0.5, 0.7, 0.5)), 1.0);
-}
-
 brEnvironment brCalculateSunParams(brEnvironment env, float TIME_OF_DAY) {
   float t = 2.0 * BR_PI * TIME_OF_DAY;
   // the game's sun rises in the east (+x), Newb X mirrors it because its own sun quad is mirrored
