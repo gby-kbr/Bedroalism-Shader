@@ -3,34 +3,38 @@
 
 // Color correction
 #define BR_EXPOSURE 1.2  // 0.5 dark ~ 3.0 bright
-#define BR_GAMMA    1.25 // 0.3 low ~ 2.0 high, Newb uses 1.33
+#define BR_GAMMA    1.25 // 0.3 low ~ 2.0 high
 
 // Uchimura tonemap
 #define BR_UCHIMURA_P 1.0  // max display brightness
 #define BR_UCHIMURA_A 1.1  // contrast, 1.0 neutral ~ 1.3 punchy
 #define BR_UCHIMURA_M 0.2  // where the straight section starts
 #define BR_UCHIMURA_L 0.5  // length of the straight section
-#define BR_UCHIMURA_C 1.3  // black tightness, 1.0 lifted ~ 1.6 deep
+#define BR_UCHIMURA_C 1.5  // black tightness, 1.0 lifted ~ 1.6 deep
 #define BR_UCHIMURA_B 0.0  // pedestal, keep 0.0 or additive layers (sun, stars) lift black
 
 // Sun and moon, the SunMoon material and the light direction share these
 #define BR_SUN_SIZE        2.0   // 0.3 tiny ~ 4.0 massive
-#define BR_MOON_SIZE       2.0   // 0.3 tiny ~ 4.0 massive
+#define BR_MOON_SIZE       2.2   // 0.3 tiny ~ 4.0 massive
 #define BR_SUNMOON_GLOW    1.0   // 0.0 none ~ 2.0 strong, the soft glow around the sun and the moon
-#define BR_SUN_PATH_YAW    0.0   // degrees, turns the path around the vertical axis
-#define BR_MOON_PATH_YAW   0.0
+#define BR_SUN_PATH_YAW    10.0   // degrees, turns the path around the vertical axis
+#define BR_MOON_PATH_YAW   -10.0
 #define BR_SUN_PATH_TILT   25.0  // degrees, tilts the path, 0.0 passes straight overhead
 #define BR_MOON_PATH_TILT -20.0
 
 // Sky colors, linear, from Newb X
 #define BR_DAY_ZENITH_COL    vec3(0.3, 0.9, 2.0)
 #define BR_DAY_HORIZON_COL   vec3(0.5, 1.15, 1.95)
+
 #define BR_DAWN_ZENITH_COL   vec3(0.12, 0.28, 0.62)
 #define BR_DAWN_HORIZON_COL  vec3(1.85, 1.3, 0.9)
+
 #define BR_NIGHT_ZENITH_COL  vec3(0.008, 0.048, 0.08)
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
+
 #define BR_RAIN_ZENITH_COL   vec3(0.52, 0.50, 0.59)
 #define BR_RAIN_HORIZON_COL  vec3(0.56, 0.54, 0.62)
+
 #define BR_DAWN_AMOUNT       1.0  // 0.0 no dawn color ~ 1.0 full dawn color, it only shows around the sun
 #define BR_SKY_RAIN_MIX      1.0 // 0.0 no change ~ 1.0 fully overcast in rain
 
@@ -54,8 +58,8 @@
 // Water
 #define BR_WATER_COLOR       vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
 #define BR_WATER_OPACITY     0.35 // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
-#define BR_WATER_WAVE_HEIGHT 0.75  // 0.0 flat ~ 2.0 rough
-#define BR_WATER_WAVE_SPEED  0.6  // 0.0 still ~ 2.0 fast
+#define BR_WATER_WAVE_HEIGHT 0.7  // 0.0 flat ~ 2.0 rough
+#define BR_WATER_WAVE_SPEED  0.5  // 0.0 still ~ 2.0 fast
 #define BR_WATER_WAVE_RANGE  16.0 // blocks around the camera where the surface mesh moves
 #define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
 #define BR_CAUSTICS          2.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom of the sea, seen from above and under water
@@ -71,12 +75,12 @@
 // Clouds
 #define BR_CLOUD_COVER 0.5  // 0.0 clear ~ 1.0 overcast, how much of the sky the clouds cover
 #define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
-#define BR_CLOUD_SOFTNESS  0.16 // 0.05 sharp ~ 0.4 very soft, how wide the soft edge of the clouds is
+#define BR_CLOUD_SOFTNESS  0.2 // 0.05 sharp ~ 0.4 very soft, how wide the soft edge of the clouds is
 #define BR_CLOUD_ROUGHNESS 0.10 // 0.0 smooth ~ 0.3 ragged, how much small detail breaks the edge
 
 // Shadows
 #define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
-#define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
+#define BR_SIDE_SHADOW 0.8 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 // End
 #define BR_END_FOG_COL vec3(0.490, 0.553, 0.667) // must match fog_color #7D8DAA in mcpack/fogs/the_end_fog_setting.json, it also detects the End
