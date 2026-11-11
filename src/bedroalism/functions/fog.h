@@ -66,31 +66,39 @@ vec3 brFogColor(vec3 dir, brEnvironment env) {
   return brRenderSky(brSkyColors(env), dir);
 }
 
+// The fog is worked out per vertex and handed to the pixels as two vectors: color*mul + add. That is
+// the same as mixing the color toward the fog and then toward the ground mist, but it costs the pixels one
+// multiply and one add.
 // relPos: camera to surface. worldXZ: absolute xz of the surface. skyLight: 0.0 ~ 1.0, caves get no sky fog
 // vanillaFogColor, vanillaFog: the game's fog, it still hides the edge of the render distance
-vec3 brApplyFog(vec3 col, vec3 relPos, vec2 worldXZ, float camY, float skyLight, float renderDist, float t, brEnvironment env, vec3 vanillaFogColor, float vanillaFog) {
+void brFogTerms(vec3 relPos, vec2 worldXZ, float camY, float skyLight, float renderDist, float t, brEnvironment env, vec3 vanillaFogColor, float vanillaFog, out vec3 fogMul, out vec3 fogAdd) {
   if (env.end || env.nether) {
-    return mix(col, vanillaFogColor, vanillaFog);
+    fogMul = vec3_splat(1.0 - vanillaFog);
+    fogAdd = vanillaFogColor*vanillaFog;
+    return;
   }
   float dist = length(relPos);
   vec3 dir = relPos/max(dist, 0.0001);
   if (env.underwater) {
     // clear water haze instead of the thick vanilla fog
-    return brUnderwaterFog(col, dist, env, skyLight);
+    fogMul = brUnderwaterTransmit(dist);
+    fogAdd = brWaterScatterColor(env, skyLight)*(1.0 - fogMul);
+    return;
   }
   float open = smoothstep(0.15, 0.75, skyLight);
   float fog = 1.0 - exp(-brFogOpticalDepth(camY, dir.y, dist, env)*(0.3 + 0.7*open));
   float mist = brRain(env)*open*brWindMist(worldXZ, t)*BR_RAIN_MIST*smoothstep(0.03, 0.5, dist/max(renderDist, 1.0));
   float amount = max(1.0 - (1.0 - fog)*(1.0 - mist), vanillaFog);
   vec3 fogCol = mix(vanillaFogColor, brFogColor(dir, env), open);
-  col = mix(col, fogCol, amount);
 
   // ground mist: whiter than the sky and brighter toward the sun
   float ground = 1.0 - exp(-brGroundMist(worldXZ - relPos.xz, relPos.xz, camY, dir.y, dist, t, env)*open);
   float s = max(dot(dir, env.sunDir), 0.0);
   float toSun = (0.6*pow(s, 4.0) + 1.4*pow(s, 24.0))*env.day;
   vec3 mistCol = fogCol*(1.0 + 0.6*env.day) + vec3(0.6, 0.55, 0.45)*toSun;
-  return mix(col, mistCol, ground);
+
+  fogMul = vec3_splat((1.0 - amount)*(1.0 - ground));
+  fogAdd = fogCol*(amount*(1.0 - ground)) + mistCol*ground;
 }
 
 #endif

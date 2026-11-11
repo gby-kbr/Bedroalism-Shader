@@ -12,6 +12,7 @@
 #define BR_UCHIMURA_L 0.5  // length of the straight section
 #define BR_UCHIMURA_C 1.5  // black tightness, 1.0 lifted ~ 1.6 deep
 #define BR_UCHIMURA_B 0.0  // pedestal, keep 0.0 or additive layers (sun, stars) lift black
+#define BR_BLACK_LEVEL 0.04 // 0.0 off ~ 0.1 deep, the darkest part of the image is cut to black so the darks are not grey
 
 // Sun and moon, the SunMoon material and the light direction share these
 #define BR_SUN_SIZE        2.0   // 0.3 tiny ~ 4.0 massive

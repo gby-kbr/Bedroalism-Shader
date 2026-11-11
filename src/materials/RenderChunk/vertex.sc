@@ -3,13 +3,15 @@ $input a_color0, a_position, a_texcoord0, a_texcoord1
     $input i_data1, i_data2, i_data3
 #endif
 
-$output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_water, v_worldPos, v_worldPosition
+$output v_clipPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_fogAdd, v_fogMul, v_lightmapUV, v_sunLight, v_texcoord0, v_water, v_worldPos, v_worldPosition
 
 #include <bgfx_shader.sh>
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/water.h>
 #include <bedroalism/functions/detection.h>
+#include <bedroalism/functions/fog.h>
+#include <bedroalism/functions/lighting.h>
 #include <bedroalism/functions/wave.h>
 
 uniform vec4 RenderChunkFogAlpha;
@@ -18,6 +20,7 @@ uniform vec4 ViewPositionAndTime;
 uniform vec4 FogColor;
 uniform vec4 MeshContext;
 uniform vec4 CameraPosition;
+uniform vec4 TimeOfDay;
 
 SAMPLER2D_AUTOREG(s_MatTexture);
 
@@ -110,6 +113,16 @@ void main() {
         color.a = mix(a_color0.a, 1.0, clamp(camDist / FogAndDistanceControl.w, 0.0, 1.0));
     }
 #endif
+
+    // fog and the color of the sun or moon light are worked out here, once per vertex and not per pixel
+    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+    vec3 relPos = worldPos - ViewPositionAndTime.xyz;
+    vec3 fogMul;
+    vec3 fogAdd;
+    brFogTerms(relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, lightmapUV.y, FogAndDistanceControl.z, ViewPositionAndTime.w, env, FogColor.rgb, fogIntensity, fogMul, fogAdd);
+    v_fogMul = vec4(fogMul, 0.0);
+    v_fogAdd = vec4(fogAdd, 0.0);
+    v_sunLight = vec4(brSunMoonLightColor(env, brSkyColors(env)), 0.0);
 
     v_clipPosition = position;
     v_worldPosition = vec4(worldPos, 1.0);

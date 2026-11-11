@@ -3,7 +3,7 @@ $input a_color0, a_position, a_texcoord0
     $input i_data1, i_data2, i_data3
 #endif
 
-$output v_color0, v_texcoord0, v_worldPos
+$output v_color0, v_texcoord0, v_time, v_worldPos
 
 #include <bgfx_shader.sh>
 #include <bedroalism/config.h>
@@ -11,6 +11,7 @@ $output v_color0, v_texcoord0, v_worldPos
 #include <bedroalism/functions/sunmoon.h>
 
 uniform vec4 TimeOfDay;
+uniform vec4 ViewPositionAndTime;
 
 void main() {
     vec3 worldPosition;
@@ -28,6 +29,7 @@ void main() {
 
     v_color0 = a_color0;
     v_texcoord0 = a_texcoord0;
+    v_time = vec4(ViewPositionAndTime.w, 0.0, 0.0, 0.0);
     v_worldPos = worldPosition;
     gl_Position = mul(u_viewProj, vec4(worldPosition, 1.0));
 }

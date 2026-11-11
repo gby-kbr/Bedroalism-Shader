@@ -16,3 +16,6 @@ centroid vec2 v_texcoord0               : TEXCOORD0;
 vec3          v_worldPos                : TEXCOORD3;
 vec4          v_worldPosition           : COLOR3;
 vec4          v_water                   : TEXCOORD4; // water flag, water top flag, lightmap uv for the shadows
+vec4          v_fogMul                  : TEXCOORD5; // fog: color*mul + add
+vec4          v_fogAdd                  : TEXCOORD6;
+vec4          v_sunLight                : TEXCOORD7; // color of the sun or moon light

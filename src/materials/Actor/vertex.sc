@@ -3,9 +3,11 @@ $input a_position, a_color0, a_texcoord0, a_indices, a_normal
     $input i_data1, i_data2, i_data3
 #endif
 
-$output v_clipPosition, v_color0, v_fog, v_light, v_texcoord0, v_worldPos
+$output v_clipPosition, v_color0, v_fog, v_fogAdd, v_fogMul, v_light, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
+#include <bedroalism/config.h>
+#include <bedroalism/functions/fog.h>
 #include <MinecraftRenderer.Materials/DynamicUtil.dragonh>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 #include <MinecraftRenderer.Materials/TAAUtil.dragonh>
@@ -16,6 +18,10 @@ uniform vec4 FogColor;
 uniform vec4 FogControl;
 uniform vec4 UVAnimation;
 uniform mat4 Bones[8];
+uniform vec4 FogAndDistanceControl;
+uniform vec4 TimeOfDay;
+uniform vec4 CameraPosition;
+uniform vec4 ViewPositionAndTime;
 
 void main() {
     mat4 World = u_model[0];
@@ -49,6 +55,16 @@ void main() {
     v_texcoord0 = texcoord0;
     v_color0 = a_color0;
 #endif
+
+    // fog is worked out here, once per vertex and not per pixel
+    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
+    vec3 camPos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz;
+    vec3 relPos = worldPosition - camPos;
+    vec3 fogMul;
+    vec3 fogAdd;
+    brFogTerms(relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, 1.0, FogAndDistanceControl.z, ViewPositionAndTime.w, env, fog.rgb, fog.a, fogMul, fogAdd);
+    v_fogMul = vec4(fogMul, 0.0);
+    v_fogAdd = vec4(fogAdd, 0.0);
 
     v_clipPosition = position;
     v_fog = fog;

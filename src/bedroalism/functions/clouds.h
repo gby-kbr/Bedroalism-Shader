@@ -11,8 +11,9 @@
 //            much cloud the sunlight crosses to reach the point: that is the shading and the bright rim.
 // ---------------------------------------------------------------------------------------------
 
-// returns the color of the clouds (rgb) and how much they cover the sky behind (a)
-vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float time) {
+// the shape of the clouds in a direction: x soft density, y density with the detail, z how much of the sky they
+// cover (0.0 ~ 1.0), w where the edge of the clouds is. uv is where the cloud noise was read
+vec4 brCloudShape(sampler2D tex, vec3 dir, brEnvironment env, float time, out vec2 uv) {
   // no early return below the horizon: a texture read in a branch that changes inside one screen quad
   // gives a line there. The clouds fade out to nothing at the horizon anyway
   float up = max(dir.y, 0.0);
@@ -26,12 +27,31 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   vec2 twist = texture2D(tex, plane*0.045 + wind*0.4).rg - 0.5;
 
   // cumulus
-  vec2 uv = plane*0.2 + wind + twist*0.04;
+  uv = plane*0.2 + wind + twist*0.04;
   vec4 n = texture2D(tex, uv);
   float soft = n.r*0.35 + n.g*0.65;
   float d = soft + (n.b - 0.5)*BR_CLOUD_ROUGHNESS;
   float edge = 1.0 - cover;
   float density = smoothstep(edge, edge + BR_CLOUD_SOFTNESS + 0.12*rain, d);
+  return vec4(soft, d, density, edge);
+}
+
+// how much clouds hide the sky in a direction: the sun and the moon are behind them
+float brCloudCover(sampler2D tex, vec3 dir, brEnvironment env, float time) {
+  vec2 uv;
+  return brCloudShape(tex, dir, env, time, uv).z*smoothstep(0.0, 0.22, max(dir.y, 0.0)); // faded out at the horizon
+}
+
+// returns the color of the clouds (rgb) and how much they cover the sky behind (a)
+vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float time) {
+  float up = max(dir.y, 0.0);
+  float rain = brRain(env);
+  vec2 uv;
+  vec4 shape = brCloudShape(tex, dir, env, time, uv);
+  float soft = shape.x;
+  float d = shape.y;
+  float edge = shape.w;
+  float density = shape.z;
 
   // how much cloud lies between the point and the sun: the side facing the sun is bright
   vec2 toSun = normalize(env.sunDir.xz + vec2(1e-4, 0.0))*0.012;

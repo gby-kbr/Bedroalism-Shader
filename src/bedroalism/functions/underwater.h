@@ -11,11 +11,9 @@ vec3 brUnderwaterAbsorption() {
   return vec3(0.22, 0.045, 0.018)*BR_UNDERWATER_DENSITY; // per block
 }
 
-// color of what is seen at distance dist under water
-// skyLight: sky light of the seen position, 0.0 ~ 1.0
-vec3 brUnderwaterFog(vec3 col, float dist, brEnvironment env, float skyLight) {
-  vec3 T = exp(-brUnderwaterAbsorption()*dist);
-  return col*T + brWaterScatterColor(env, skyLight)*(1.0 - T);
+// how much of the color of a surface at distance dist survives under water, per channel
+vec3 brUnderwaterTransmit(float dist) {
+  return exp(-brUnderwaterAbsorption()*dist);
 }
 
 // The surface seen from below, with the same opacity formula as the surface seen from above, so it is

@@ -1,0 +1,19 @@
+{
+  "name": "BrCloudNoise",
+  "register_slot": 1,
+  "binding_slot": 1,
+  "type": "texture2D",
+  "precision": "mediump",
+  "access": "readonly",
+  "texture_format": "",
+  "default_texture": "",
+  "unordered_access": false,
+  "slot_count": 1,
+  "texture_path": "textures/environment/cloud_noise",
+  "unknown": 0,
+  "sampler_state": {
+    "filter": "Bilinear",
+    "wrapping": "Repeat"
+  },
+  "custom_type_info": {}
+}

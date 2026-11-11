@@ -1,9 +1,8 @@
-$input v_clipPosition, v_color0, v_fog, v_light, v_texcoord0, v_worldPos
+$input v_clipPosition, v_color0, v_fog, v_fogAdd, v_fogMul, v_light, v_texcoord0, v_worldPos
 
 #include <bgfx_shader.sh>
 #include <bedroalism/config.h>
 #include <bedroalism/functions/colorcorrection.h>
-#include <bedroalism/functions/fog.h>
 #include <MinecraftRenderer.Materials/ActorUtil.dragonh>
 #include <MinecraftRenderer.Materials/FogUtil.dragonh>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
@@ -22,11 +21,6 @@ uniform vec4 DitherParams;
 uniform vec4 DitherParams2[3];
 uniform vec4 DitheringEnabledToggle;
 
-uniform vec4 FogColor;
-uniform vec4 FogAndDistanceControl;
-uniform vec4 TimeOfDay;
-uniform vec4 CameraPosition;
-uniform vec4 ViewPositionAndTime;
 SAMPLER2D_AUTOREG(s_MatTexture);
 SAMPLER2D_AUTOREG(s_MatTexture1);
 
@@ -71,10 +65,7 @@ void main() {
     }
 #endif
 
-    brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
-    vec3 camPos = mul(u_invView, vec4(0.0, 0.0, 0.0, 1.0)).xyz;
-    vec3 relPos = v_worldPos - camPos;
-    albedo.rgb = brApplyFog(albedo.rgb, relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, 1.0, FogAndDistanceControl.z, ViewPositionAndTime.w, env, v_fog.rgb, v_fog.a);
+    albedo.rgb = albedo.rgb*v_fogMul.rgb + v_fogAdd.rgb; // fog, worked out in the vertex shader
     albedo.rgb = brColorCorrection(albedo.rgb);
     gl_FragColor = albedo;
 #endif

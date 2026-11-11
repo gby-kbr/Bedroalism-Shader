@@ -1,4 +1,4 @@
-$input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_lightmapUV, v_texcoord0, v_water, v_worldPos
+$input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_fog, v_fogAdd, v_fogMul, v_lightmapUV, v_sunLight, v_texcoord0, v_water, v_worldPos
 
 #include <bgfx_shader.sh>
 #include <bedroalism/config.h>
@@ -89,7 +89,6 @@ void main() {
         geoNormal = -geoNormal;
     }
 
-    brSkyColor sky = brSkyColors(env);
     bool isWater = false;
 #if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS))
     if (v_water.x > 0.5) {
@@ -106,6 +105,7 @@ void main() {
             // under the surface: as clear as from above, with the sun and moon showing through
             diffuse = brUnderwaterSurface(viewDir, -nrm, env);
         } else {
+            brSkyColor sky = brSkyColors(env); // only water pixels need it
             diffuse = brWaterAbove(viewDir, nrm, v_lightmapUV, v_color0.rgb, env, sky, s_BrCloudNoise, ViewPositionAndTime.w);
         }
     }
@@ -122,7 +122,7 @@ void main() {
         diffuse.rgb *= 1.0 - BR_NIGHT_DARKNESS*night*(1.0 - keep);
 
         // sun and moon light color, only where sky light reaches and no torch lights the surface
-        vec3 lightCol = brSunMoonLightColor(env, sky);
+        vec3 lightCol = v_sunLight.rgb;
         diffuse.rgb *= mix(vec3_splat(1.0), lightCol, skyLit*(1.0 - torch)*(env.overworld && !env.underwater ? 1.0 : 0.0));
 
         // shadows of Aerotion, from the lightmap uv where sky light 15 is 15/16: the shadow under leaves and
@@ -153,7 +153,7 @@ void main() {
 #endif
     }
 
-    diffuse.rgb = brApplyFog(diffuse.rgb, relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, v_lightmapUV.y, FogAndDistanceControl.z, ViewPositionAndTime.w, env, FogColor.rgb, v_fog.a);
+    diffuse.rgb = diffuse.rgb*v_fogMul.rgb + v_fogAdd.rgb; // fog, worked out in the vertex shader
 
     diffuse.rgb = brColorCorrection(diffuse.rgb);
     gl_FragColor = diffuse;

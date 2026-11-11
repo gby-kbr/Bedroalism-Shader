@@ -34,7 +34,9 @@ vec3 brTonemap(vec3 col) {
 
 vec3 brColorCorrection(vec3 col) {
   col = brTonemap(col*BR_EXPOSURE);
-  return pow(col, vec3_splat(1.0 / BR_GAMMA));
+  col = pow(col, vec3_splat(1.0 / BR_GAMMA));
+  // the gamma lifts the darks to grey, this puts the blackest part of the image back to black
+  return max(col - vec3_splat(BR_BLACK_LEVEL), vec3_splat(0.0))/(1.0 - BR_BLACK_LEVEL);
 }
 
 #endif

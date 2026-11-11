@@ -13,3 +13,5 @@ vec2  v_occlusionUV     : TEXCOORD1;
 vec2  v_texcoord0       : TEXCOORD0;
 vec3  v_worldPos        : TEXCOORD3;
 vec3  v_local           : TEXCOORD4; // xy: position in the quad, z: 1.0 for rain, 0.0 for snow
+vec4  v_fogMul          : TEXCOORD5; // fog: color*mul + add
+vec4  v_fogAdd          : TEXCOORD6;
