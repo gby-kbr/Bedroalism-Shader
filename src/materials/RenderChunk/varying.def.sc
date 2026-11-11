@@ -15,4 +15,4 @@ vec2          v_lightmapUV              : TEXCOORD1;
 centroid vec2 v_texcoord0               : TEXCOORD0;
 vec3          v_worldPos                : TEXCOORD3;
 vec4          v_worldPosition           : COLOR3;
-vec4          v_water                   : TEXCOORD4; // water flag, water top flag, face shade, sky light for shadows
+vec4          v_water                   : TEXCOORD4; // water flag, water top flag, lightmap uv for the shadows

@@ -79,8 +79,8 @@
 #define BR_CLOUD_ROUGHNESS 0.10 // 0.0 smooth ~ 0.3 ragged, how much small detail breaks the edge
 
 // Shadows
-#define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, how dark the shadow of the sun is
-#define BR_SIDE_SHADOW 0.8  // 1.0 none ~ 0.0 black, the sun light kept on the sides of blocks (0.8 as in Aerotion)
+#define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
+#define BR_SIDE_SHADOW 0.8 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 // End
 #define BR_END_FOG_COL vec3(0.490, 0.553, 0.667) // must match fog_color #7D8DAA in mcpack/fogs/the_end_fog_setting.json, it also detects the End
