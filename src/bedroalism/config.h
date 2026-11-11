@@ -14,8 +14,9 @@
 #define BR_UCHIMURA_B 0.0  // pedestal, keep 0.0 or additive layers (sun, stars) lift black
 
 // Sun and moon, the SunMoon material and the light direction share these
-#define BR_SUN_SIZE        1.5   // 0.3 tiny ~ 4.0 massive
-#define BR_MOON_SIZE       1.5   // 0.3 tiny ~ 4.0 massive
+#define BR_SUN_SIZE        2.0   // 0.3 tiny ~ 4.0 massive
+#define BR_MOON_SIZE       2.0   // 0.3 tiny ~ 4.0 massive
+#define BR_SUNMOON_GLOW    1.0   // 0.0 none ~ 2.0 strong, the soft glow around the sun and the moon
 #define BR_SUN_PATH_YAW    0.0   // degrees, turns the path around the vertical axis
 #define BR_MOON_PATH_YAW   0.0
 #define BR_SUN_PATH_TILT   25.0  // degrees, tilts the path, 0.0 passes straight overhead
@@ -57,7 +58,7 @@
 #define BR_WATER_WAVE_SPEED  0.6  // 0.0 still ~ 2.0 fast
 #define BR_WATER_WAVE_RANGE  16.0 // blocks around the camera where the surface mesh moves
 #define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
-#define BR_CAUSTICS          2.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom, only under water
+#define BR_CAUSTICS          2.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom of the sea, seen from above and under water
 #define BR_UNDERWATER_DENSITY 0.9 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
 #define BR_UNDERWATER_SURFACE_SMOOTH 0.75 // 0 = full waves, 1 = flat surface seen from below
 
@@ -70,13 +71,15 @@
 // Clouds
 #define BR_CLOUD_COVER 0.5  // 0.0 clear ~ 1.0 overcast, how much of the sky the clouds cover
 #define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
+#define BR_CLOUD_SOFTNESS  0.16 // 0.05 sharp ~ 0.4 very soft, how wide the soft edge of the clouds is
+#define BR_CLOUD_ROUGHNESS 0.10 // 0.0 smooth ~ 0.3 ragged, how much small detail breaks the edge
 
 // Shadows
 #define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
 #define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 // End
-#define BR_END_FOG_COL vec3(0.867, 0.875, 0.647) // must match fog_color #DDDFA5 in mcpack/fogs/the_end_fog_setting.json, it also detects the End
+#define BR_END_FOG_COL vec3(0.490, 0.553, 0.667) // must match fog_color #7D8DAA in mcpack/fogs/the_end_fog_setting.json, it also detects the End
 
 // Night
 #define BR_NIGHT_DARKNESS 0.9 // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept

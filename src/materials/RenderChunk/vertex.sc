@@ -118,7 +118,10 @@ void main() {
     v_fog = fog;
     v_lightmapUV = lightmapUV;
     v_texcoord0 = uv0;
-    v_water = water;
+    // sky light and face shade for the shadows, decoded like Aerotion: sky light 15 is 0.9375
+    vec2 uv1 = fract(a_texcoord1.y * vec2(256.0, 4096.0));
+    bool isColored = color.r != color.g || color.r != color.b;
+    v_water = vec4(water, isColored ? color.g * 1.5 : color.g, uv1.y);
     v_worldPos = worldPos;
     gl_Position = position;
 }

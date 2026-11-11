@@ -19,7 +19,11 @@ void main() {
     brSkyColor skyColors = brSkyColors(env);
     vec3 sky = brRenderSky(skyColors, dir);
     if (env.overworld) {
-        sky += brStars(s_BrStarMap, dir, env); // under the clouds
+        // the stars only run at night (the same for every pixel, so textures stay safe in the branch)
+        if (env.night > 0.0) {
+            sky += brStars(s_BrStarMap, dir, env); // under the clouds
+        }
+        sky += brSunMoonGlow(dir, env);
         vec4 clouds = brClouds(s_BrCloudNoise, dir, env, skyColors, v_time.x);
         sky = mix(sky, clouds.rgb, clouds.a);
     }

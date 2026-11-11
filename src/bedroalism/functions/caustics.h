@@ -16,7 +16,8 @@
 // The animation: two layers of different scale and direction slide over each other, and the depth they are
 // read at swells slowly, so the lines also fold and open like real caustics instead of only drifting.
 // Water bends blue light more than red, so the three colors are read at slightly different depths.
-// Only under water in the overworld: the function returns the color unchanged anywhere else.
+// On the bottom of the sea in the overworld, seen from under and from above the water. Only the sea level is
+// known (BR_CAUSTIC_SURFACE_Y), so ground below it counts as lying under water. Anywhere else the color is unchanged.
 // ---------------------------------------------------------------------------------------------
 
 #define BR_CAUSTIC_SURFACE_Y 62.8   // height of the water surface of the sea
@@ -51,11 +52,15 @@ vec3 brCausticLight(sampler2D tex, vec2 p, float t, float depth) {
 // col: the lit color of a surface. worldXZ, worldY: where it is. camDist: distance to the camera, blocks
 // geoNormal: normal of the face toward the camera. skyLight: lightmap y of the surface
 vec3 brCaustics(sampler2D tex, vec3 col, vec2 worldXZ, float worldY, float camDist, vec3 geoNormal, float skyLight, brEnvironment env, float time) {
-  if (!env.overworld || !env.underwater) {
+  float sun = env.day + 0.5*env.twilight;
+  float rawDepth = BR_CAUSTIC_SURFACE_Y - worldY;
+  // most pixels are dry land or at night: leave before the texture reads (cheaper on phones)
+  if (!env.overworld || sun <= 0.0 || rawDepth < 0.5) {
     return col;
   }
 
-  float depth = clamp(BR_CAUSTIC_SURFACE_Y - worldY, 0.4, 14.0);
+  float depth = clamp(rawDepth, 0.4, 14.0);
+  float submerged = smoothstep(0.5, 1.5, rawDepth); // shore ground near the surface is dry land
 
   // the sun refracts into the water, the pattern lies shifted away from the sun: the ray that lights a point
   // entered the surface closer to the sun by d*tan(refracted angle)
@@ -68,11 +73,10 @@ vec3 brCaustics(sampler2D tex, vec3 col, vec2 worldXZ, float worldY, float camDi
   vec3 light = brCausticLight(tex, p, time, depth);
 
   // only sunlight makes the pattern: by day, in the open sky light, fading with the depth as the water absorbs
-  float sun = env.day + 0.5*env.twilight;
   float open = smoothstep(0.35, 0.9, skyLight);
   float up = smoothstep(0.1, 0.7, geoNormal.y);
   float reach = exp(-0.16*depth)*(1.0 - smoothstep(30.0, 70.0, camDist));
-  float k = clamp(BR_CAUSTICS*sun*open*up*reach*(1.0 - 0.6*brRain(env)), 0.0, 1.0);
+  float k = clamp(BR_CAUSTICS*sun*open*up*reach*submerged*(1.0 - 0.6*brRain(env)), 0.0, 1.0);
 
   return col*mix(vec3(1.0, 1.0, 1.0), light, k);
 }

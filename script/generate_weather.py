@@ -1,7 +1,7 @@
 """Generates textures/environment/weather.png, the rain and snow sprites of the Weather material.
 
 64x64, the layout the game expects: snow sprites in the top row (8x8 cells), rain sprites below them
-(8 columns, 8 px wide), and a few solid squares used by other particles.
+(8 columns, 8 px wide). The rest is empty, so the blue splash squares of the game are not drawn.
 Rain: a thin streak per column with a soft head and a long fading tail, each column a little different.
 Snow: soft round flakes of different sizes.
 Usage: python3 script/generate_weather.py   (needs numpy and Pillow)
@@ -40,10 +40,6 @@ def main():
             for x in range(8):
                 d = math.hypot(x - 3.5, y - 3.5)
                 a[y, 8 * k + x] = strength * (1.0 - smoothstep(radius * 0.3, radius, d))
-
-    # solid squares for the other particles
-    for x0, y0 in ((0, 40), (0, 48), (0, 56), (8, 56)):
-        a[y0:y0 + 6, x0:x0 + 6] = 1.0
 
     rgba = np.empty((64, 64, 4), np.uint8)
     rgba[..., :3] = 255  # white everywhere, so the filtering never blends in dark edges

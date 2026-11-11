@@ -89,11 +89,11 @@ void main() {
         geoNormal = -geoNormal;
     }
 
+    brSkyColor sky = brSkyColors(env);
     bool isWater = false;
 #if defined(TRANSPARENT) && !(defined(RENDER_AS_BILLBOARDS) || defined(SEASONS))
     if (v_water.x > 0.5) {
         isWater = true;
-        brSkyColor sky = brSkyColors(env);
 
         // the top face gets the animated waves, the other faces use the normal of the geometry
         bool top = v_water.y > 0.5;
@@ -122,14 +122,17 @@ void main() {
         diffuse.rgb *= 1.0 - BR_NIGHT_DARKNESS*night*(1.0 - keep);
 
         // sun and moon light color, only where sky light reaches and no torch lights the surface
-        vec3 lightCol = brSunMoonLightColor(env, brSkyColors(env));
+        vec3 lightCol = brSunMoonLightColor(env, sky);
         diffuse.rgb *= mix(vec3_splat(1.0), lightCol, skyLit*(1.0 - torch)*(env.overworld && !env.underwater ? 1.0 : 0.0));
 
-        // lightmap shadows, only in the overworld daytime and only where sky light reaches
-        float sunlit = smoothstep(0.45, 0.70, v_lightmapUV.y)*(1.0 - env.night)*(1.0 - env.rainFactor)*(env.overworld && !env.underwater ? 1.0 : 0.0);
-        float shadow = (1.0 - smoothstep(0.860, 0.875, v_lightmapUV.y*v_lightmapUV.y))*(1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0))*sunlit;
-        float sideShadow = step(0.9, abs(geoNormal.x))*sunlit*(1.0 - shadow); // the whole side face, not over the first shadow
-        diffuse.rgb *= (1.0 - BR_SHADOW*shadow)*(1.0 - BR_SIDE_SHADOW*sideShadow);
+        // shadows like Aerotion: full sunlight only where the sky light is 15, less sky light is shaded and
+        // the side faces are a little darker. Gone at night, in the rain and near torch light
+        float skyUV = v_water.w;
+        float shadowLit = max(step(0.93, skyUV), 0.3*skyUV*skyUV);
+        shadowLit *= v_water.z > 0.8 ? 1.0 : 1.0 - 0.3*BR_SIDE_SHADOW;
+        float sunMask = smoothstep(0.40, 0.70, skyUV)*(1.0 - env.night)*(1.0 - env.rainFactor)*(env.overworld && !env.underwater ? 1.0 : 0.0);
+        sunMask *= 1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0);
+        diffuse.rgb *= 1.0 - BR_SHADOW*sunMask*(1.0 - shadowLit);
 
         // rain wets open ground, flat ground gets puddles with rings of drops (not on leaves and plants)
 #if defined(ALPHA_TEST) || defined(SEASONS) || defined(TRANSPARENT)
@@ -140,7 +143,7 @@ void main() {
         diffuse.rgb = brWetSurface(diffuse.rgb, relPos + CameraPosition.xyz, geoNormal, viewDir, v_lightmapUV.y, wetOpaque, ViewPositionAndTime.w, env);
 
 #if !defined(ALPHA_TEST) && !defined(SEASONS) && !defined(TRANSPARENT)
-        // the moving light pattern on the bottom, only under water in the overworld
+        // the moving light pattern on the bottom of the sea, from under and above the water
         diffuse.rgb = brCaustics(s_BrCausticNoise, diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
 #endif
     }

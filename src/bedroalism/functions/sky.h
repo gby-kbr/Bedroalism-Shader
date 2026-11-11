@@ -54,7 +54,8 @@ brSkyColor brSkyColors(brEnvironment env) {
 
 // viewDir: normalized, y up
 vec3 brRenderSky(brSkyColor s, vec3 viewDir) {
-  float vh = 1.0 - viewDir.y*viewDir.y;
+  float up = max(viewDir.y, 0.0); // below the horizon the sky keeps the horizon color
+  float vh = 1.0 - up*up;
   float gradient = vh*vh*vh; // a long soft fade from the horizon to the zenith
   float nearSun = smoothstep(-0.2, 0.9, dot(viewDir, s.sunDir)); // dawn color only around the sun
   vec3 horizon = mix(s.baseHorizon, s.dawnHorizon, s.dawn*nearSun);
@@ -70,6 +71,19 @@ float brGlowVisibility(float lightHeight) {
 
 // angular radius of the visible disc inside the sun and moon quad, for size 1.0
 #define BR_SUNMOON_DISC_RADIUS 0.0583
+
+// soft halo around the sun and the moon, a bright core fading into a wide faint glow. Added to the sky,
+// the clouds in front of it hide it. size scales with the quad size of each
+vec3 brSunMoonGlow(vec3 dir, brEnvironment env) {
+  float sunAngle = sqrt(2.0*max(1.0 - dot(dir, env.sunDir), 0.0))/(BR_SUNMOON_DISC_RADIUS*BR_SUN_SIZE);
+  float moonAngle = sqrt(2.0*max(1.0 - dot(dir, env.moonDir), 0.0))/(BR_SUNMOON_DISC_RADIUS*BR_MOON_SIZE);
+  float sunGlow = exp(-sunAngle*1.1)*0.45 + exp(-sunAngle*0.22)*0.14;
+  float moonGlow = exp(-moonAngle*1.2)*0.30 + exp(-moonAngle*0.25)*0.08;
+  vec3 sunCol = mix(vec3(1.0, 0.92, 0.78), vec3(1.0, 0.62, 0.38), env.twilight*0.6);
+  vec3 glow = sunCol*sunGlow*brGlowVisibility(env.sunDir.y)*env.day
+            + vec3(0.55, 0.68, 1.0)*moonGlow*brGlowVisibility(env.moonDir.y)*env.night;
+  return glow*BR_SUNMOON_GLOW*(1.0 - 0.8*brRain(env));
+}
 
 // the sun and moon discs, for reflections and for looking up through the water surface
 // dir: normalized direction of the ray. radiance scales the brightness of each disc

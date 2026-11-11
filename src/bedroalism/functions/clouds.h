@@ -13,12 +13,11 @@
 
 // returns the color of the clouds (rgb) and how much they cover the sky behind (a)
 vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float time) {
-  if (dir.y < 0.0) {
-    return vec4(0.0, 0.0, 0.0, 0.0);
-  }
-
+  // no early return below the horizon: a texture read in a branch that changes inside one screen quad
+  // gives a line there. The clouds fade out to nothing at the horizon anyway
+  float up = max(dir.y, 0.0);
   float rain = brRain(env);
-  float lift = 1.0/(dir.y*0.9 + 0.2);       // the layer is far away at the horizon
+  float lift = 1.0/(up*0.9 + 0.2);       // the layer is far away at the horizon
   vec2 plane = dir.xz*lift;
   vec2 wind = vec2(1.0, 0.45)*BR_CLOUD_WIND*time*0.024; // the direction of the mist and the plants
   float cover = clamp(BR_CLOUD_COVER + 0.35*rain, 0.0, 1.0);
@@ -30,9 +29,9 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   vec2 uv = plane*0.2 + wind + twist*0.04;
   vec4 n = texture2D(tex, uv);
   float soft = n.r*0.35 + n.g*0.65;
-  float d = soft + (n.b - 0.5)*0.2;
+  float d = soft + (n.b - 0.5)*BR_CLOUD_ROUGHNESS;
   float edge = 1.0 - cover;
-  float density = smoothstep(edge, edge + 0.07 + 0.12*rain, d);
+  float density = smoothstep(edge, edge + BR_CLOUD_SOFTNESS + 0.12*rain, d);
 
   // how much cloud lies between the point and the sun: the side facing the sun is bright
   vec2 toSun = normalize(env.sunDir.xz + vec2(1e-4, 0.0))*0.012;
@@ -55,7 +54,7 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   col += sunCol*pow(max(dot(dir, env.sunDir), 0.0), 6.0)*rim*density*0.6; // silver lining
 
   // clouds fade into the haze at the horizon
-  float fade = smoothstep(0.0, 0.22, dir.y);
+  float fade = smoothstep(0.0, 0.22, up);
   col = mix(sky.horizon, col, fade);
   return vec4(col, density*fade);
 }

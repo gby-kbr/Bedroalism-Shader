@@ -18,10 +18,11 @@ struct brEnvironment {
   vec3 fogCol;      // [0.0, 1.0]
 };
 
-bool brDetectEnd(vec3 FOG_COLOR) {
-  // fog color is set to #DDDFA5 (end stone) in fogs/the_end_fog_setting.json, no other dimension has it
+bool brDetectEnd(vec3 FOG_COLOR, vec2 FOG_CONTROL) {
+  // the End fog is set in fogs/the_end_fog_setting.json: its color (BR_END_FOG_COL) and a fog that
+  // starts at 98% of the render distance, no other dimension has both
   vec3 d = abs(FOG_COLOR - BR_END_FOG_COL);
-  return max(max(d.r, d.g), d.b) < 0.006;
+  return max(max(d.r, d.g), d.b) < 0.006 && FOG_CONTROL.x > 0.9;
 }
 
 bool brDetectNether(vec3 FOG_COLOR, vec2 FOG_CONTROL) {
@@ -73,7 +74,7 @@ brEnvironment brCalculateSunParams(brEnvironment env, float TIME_OF_DAY) {
 
 brEnvironment brDetectEnvironment(float TIME_OF_DAY, vec3 FOG_COLOR, vec3 FOG_CONTROL) {
   brEnvironment env;
-  env.end = brDetectEnd(FOG_COLOR);
+  env.end = brDetectEnd(FOG_COLOR, FOG_CONTROL.xy);
   env.nether = brDetectNether(FOG_COLOR, FOG_CONTROL.xy);
   env.underwater = brDetectUnderwater(FOG_COLOR, FOG_CONTROL.xy);
   env.overworld = !env.end && !env.nether;
