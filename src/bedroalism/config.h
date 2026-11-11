@@ -75,6 +75,9 @@
 #define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
 #define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
+// Night
+#define BR_NIGHT_DARKNESS 0.85 // 0.0 vanilla ~ 1.0 zero ambient at night, torch light is kept
+
 // Stars
 #define BR_STAR_BRIGHTNESS 1.5 // 0.0 off ~ 2.0 bright, how bright the stars are
 #define BR_STAR_LINES      0.0 // 0.0 no lines ~ 1.0 clear, draws the figures of the constellations

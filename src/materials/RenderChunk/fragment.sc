@@ -113,6 +113,11 @@ void main() {
     if (!isWater) {
         diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
 
+        // night ambient, darkens places without torch light down to 0
+        float torch = smoothstep(0.1, 0.8, v_lightmapUV.x);
+        float dark = BR_NIGHT_DARKNESS*env.night*(1.0 - torch)*(env.overworld && !env.underwater ? 1.0 : 0.0);
+        diffuse.rgb *= 1.0 - clamp(dark, 0.0, 1.0);
+
         // lightmap shadows, only in the overworld daytime and only where sky light reaches
         float sunlit = smoothstep(0.45, 0.70, v_lightmapUV.y)*(1.0 - env.night)*(1.0 - env.rainFactor)*(env.overworld && !env.underwater ? 1.0 : 0.0);
         float shadow = (1.0 - smoothstep(0.860, 0.875, v_lightmapUV.y*v_lightmapUV.y))*(1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0))*sunlit;
