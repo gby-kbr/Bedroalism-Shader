@@ -41,6 +41,9 @@
 #define BR_RAIN_SPLASH  1.0  // 0.0 none ~ 2.0 strong, rings in the puddles and drops on wet ground
 #define BR_WET_DARKEN   0.3  // 0.0 none ~ 0.6 dark, how much wet surfaces darken in rain
 
+// The End
+#define BR_END_LIGHT 0.5 // 0.0 none ~ 1.0 strong, light of the black hole on the faces of blocks
+
 // Fog, overworld only
 #define BR_FOG_DENSITY 0.003  // 0.0015 thin ~ 0.012 thick, light lost per block at sea level
 #define BR_FOG_FALLOFF 0.02   // 0.008 deep layer ~ 0.05 thin ground mist, thinning with height

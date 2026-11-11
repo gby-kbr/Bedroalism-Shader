@@ -127,6 +127,15 @@ void main() {
 #endif
         diffuse.rgb = brWetSurface(diffuse.rgb, relPos + CameraPosition.xyz, geoNormal, viewDir, v_lightmapUV.y, wetOpaque, ViewPositionAndTime.w, env);
 
+        // the End: the black hole of the sky texture never moves, so it is a fixed light. Faces toward it get a cool
+        // white light and faces away from it are darker (the direction is the black hole in end_sky.png)
+        if (env.end) {
+            float toHole = dot(geoNormal, vec3(-0.853, 0.440, 0.277));
+            float lit = smoothstep(-0.6, 0.8, toHole);
+            vec3 holeLight = mix(vec3_splat(1.0 - 0.45*BR_END_LIGHT), vec3(0.85, 0.95, 1.15)*(1.0 + 0.3*BR_END_LIGHT), lit);
+            diffuse.rgb *= holeLight;
+        }
+
 #if !defined(ALPHA_TEST) && !defined(SEASONS) && !defined(TRANSPARENT)
         // the moving light pattern on the bottom, only under water in the overworld
         diffuse.rgb = brCaustics(s_BrCausticNoise, diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
