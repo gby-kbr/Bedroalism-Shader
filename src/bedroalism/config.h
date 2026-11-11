@@ -80,6 +80,10 @@
 #define BR_MOONLIGHT      0.10 // 0.0 none ~ 1.0 full, brightness left under the open night sky
 #define BR_MOONLIGHT_COL  vec3(0.62, 0.78, 1.1) // tint of the moonlit surfaces
 
+// Sun and moon light color on the world
+#define BR_NOON_LIGHT_COL    vec3(1.0, 0.96, 0.88) // white warm light of the day
+#define BR_DAWN_LIGHT_AMOUNT 1.0 // 0.0 white ~ 1.0 the pale dawn color of the sky, 1.0 is the default
+
 // Stars
 #define BR_STAR_BRIGHTNESS 1.5 // 0.0 off ~ 2.0 bright, how bright the stars are
 #define BR_STAR_LINES      0.0 // 0.0 no lines ~ 1.0 clear, draws the figures of the constellations

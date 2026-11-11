@@ -4,6 +4,7 @@ $input v_clipPosition, v_worldPosition, v_color0, v_ditheringAndMaskTinting, v_f
 #include <bedroalism/config.h>
 #include <bedroalism/functions/colorcorrection.h>
 #include <bedroalism/functions/fog.h>
+#include <bedroalism/functions/lighting.h>
 #include <bedroalism/functions/caustics.h>
 #include <bedroalism/functions/puddles.h>
 #include <MinecraftRenderer.Materials/DitherUtil.dragonh>
@@ -119,7 +120,10 @@ void main() {
         float night = smoothstep(0.0, 1.0, env.night)*(env.overworld && !env.underwater ? 1.0 : 0.0);
         float keep = max(torch, BR_MOONLIGHT*skyLit);
         diffuse.rgb *= 1.0 - BR_NIGHT_DARKNESS*night*(1.0 - keep);
-        diffuse.rgb *= mix(vec3_splat(1.0), BR_MOONLIGHT_COL, night*skyLit*(1.0 - torch));
+
+        // sun and moon light color, only where sky light reaches and no torch lights the surface
+        vec3 lightCol = brSunMoonLightColor(env, brSkyColors(env));
+        diffuse.rgb *= mix(vec3_splat(1.0), lightCol, skyLit*(1.0 - torch)*(env.overworld && !env.underwater ? 1.0 : 0.0));
 
         // lightmap shadows, only in the overworld daytime and only where sky light reaches
         float sunlit = smoothstep(0.45, 0.70, v_lightmapUV.y)*(1.0 - env.night)*(1.0 - env.rainFactor)*(env.overworld && !env.underwater ? 1.0 : 0.0);
