@@ -125,14 +125,19 @@ void main() {
         vec3 lightCol = brSunMoonLightColor(env, sky);
         diffuse.rgb *= mix(vec3_splat(1.0), lightCol, skyLit*(1.0 - torch)*(env.overworld && !env.underwater ? 1.0 : 0.0));
 
-        // shadows like Aerotion: full sunlight only where the sky light is 15, less sky light is shaded and
-        // the side faces are a little darker. Gone at night, in the rain and near torch light
+        // shadow cast by sun light, the function of Aerotion (nlLighting) with its default intensity of 1.0,
+        // the side factor is BR_SIDE_SHADOW (0.8 in Aerotion)
         float skyUV = v_water.w;
-        float shadowLit = max(step(0.93, skyUV), 0.3*skyUV*skyUV);
-        shadowLit *= v_water.z > 0.8 ? 1.0 : 1.0 - 0.3*BR_SIDE_SHADOW;
+        float nightIntensity = 1.0 - (0.5 + 0.5*env.dayFactor);
+        nightIntensity *= nightIntensity;
+        float shadow = step(0.93, skyUV);
+        shadow = max(shadow, (0.6*nightIntensity)*skyUV*skyUV);
+        shadow *= v_water.z > 0.8 ? 1.0 : BR_SIDE_SHADOW;
+        // the game lightmap already holds the sun, so the shadow only darkens it where sky light reaches,
+        // away from torch light, and never at night or in the rain
         float sunMask = smoothstep(0.40, 0.70, skyUV)*(1.0 - env.night)*(1.0 - env.rainFactor)*(env.overworld && !env.underwater ? 1.0 : 0.0);
         sunMask *= 1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0);
-        diffuse.rgb *= 1.0 - BR_SHADOW*sunMask*(1.0 - shadowLit);
+        diffuse.rgb *= 1.0 - BR_SHADOW*sunMask*(1.0 - shadow);
 
         // rain wets open ground, flat ground gets puddles with rings of drops (not on leaves and plants)
 #if defined(ALPHA_TEST) || defined(SEASONS) || defined(TRANSPARENT)
