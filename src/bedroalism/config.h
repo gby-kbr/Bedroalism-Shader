@@ -14,8 +14,8 @@
 #define BR_UCHIMURA_B 0.0  // pedestal, keep 0.0 or additive layers (sun, stars) lift black
 
 // Sun and moon, the SunMoon material and the light direction share these
-#define BR_SUN_SIZE        1.0   // 0.3 tiny ~ 4.0 massive
-#define BR_MOON_SIZE       1.0   // 0.3 tiny ~ 4.0 massive
+#define BR_SUN_SIZE        1.5   // 0.3 tiny ~ 4.0 massive
+#define BR_MOON_SIZE       1.5   // 0.3 tiny ~ 4.0 massive
 #define BR_SUN_PATH_YAW    0.0   // degrees, turns the path around the vertical axis
 #define BR_MOON_PATH_YAW   0.0
 #define BR_SUN_PATH_TILT   25.0  // degrees, tilts the path, 0.0 passes straight overhead
