@@ -127,6 +127,15 @@ void main() {
 #endif
         diffuse.rgb = brWetSurface(diffuse.rgb, relPos + CameraPosition.xyz, geoNormal, viewDir, v_lightmapUV.y, wetOpaque, ViewPositionAndTime.w, env);
 
+        if (env.end) {
+            // the black hole is a fixed picture, so its light always comes from the same direction
+            // (the middle of the black hole in end_sky.png): faces toward it are lit and cool, faces away are shaded
+            float lit = smoothstep(-0.25, 0.6, dot(geoNormal, vec3(-0.854, 0.440, 0.277)));
+            float torch = 1.0 - min(pow(v_lightmapUV.x*1.2, 6.0), 1.0); // not on faces lit by block light
+            vec3 endLight = mix(vec3_splat(1.0 - BR_END_LIGHT), vec3(0.92, 1.0, 1.12), lit);
+            diffuse.rgb *= mix(vec3_splat(1.0), endLight, torch);
+        }
+
 #if !defined(ALPHA_TEST) && !defined(SEASONS) && !defined(TRANSPARENT)
         // the moving light pattern on the bottom, only under water in the overworld
         diffuse.rgb = brCaustics(s_BrCausticNoise, diffuse.rgb, relPos.xz + CameraPosition.xz, relPos.y + CameraPosition.y, camDist, geoNormal, v_lightmapUV.y, env, ViewPositionAndTime.w);
