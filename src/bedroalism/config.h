@@ -33,8 +33,8 @@
 #define BR_NIGHT_ZENITH_COL  vec3(0.008, 0.048, 0.08)
 #define BR_NIGHT_HORIZON_COL vec3(0.02, 0.06, 0.1)
 
-#define BR_RAIN_ZENITH_COL   vec3(0.52, 0.50, 0.59)
-#define BR_RAIN_HORIZON_COL  vec3(0.56, 0.54, 0.62)
+#define BR_RAIN_ZENITH_COL   vec3(0.36, 0.38, 0.40)
+#define BR_RAIN_HORIZON_COL  vec3(0.50, 0.52, 0.54)
 
 #define BR_DAWN_AMOUNT       1.0  // 0.0 no dawn color ~ 1.0 full dawn color, it only shows around the sun
 #define BR_SKY_RAIN_MIX      1.0 // 0.0 no change ~ 1.0 fully overcast in rain
@@ -76,6 +76,7 @@
 // Clouds
 #define BR_CLOUD_COVER 0.5  // 0.0 clear ~ 1.0 overcast, how much of the sky the clouds cover
 #define BR_CLOUD_ZENITH 0.5 // 0.0 plain cloud color ~ 1.0 full zenith color, how much the underside of the clouds takes of the sky above
+#define BR_CLOUD_SKY_BLEND 0.35 // 0.0 clouds keep their own color ~ 1.0 the color of the sky, in rain and at night
 #define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
 #define BR_CLOUD_SOFTNESS  0.2 // 0.05 sharp ~ 0.4 very soft, how wide the soft edge of the clouds is
 #define BR_CLOUD_ROUGHNESS 0.10 // 0.0 smooth ~ 0.3 ragged, how much small detail breaks the edge

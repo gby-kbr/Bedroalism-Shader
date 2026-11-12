@@ -62,12 +62,16 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   float rim = 1.0 - smoothstep(edge, edge + 0.3, d);                 // thin edges let the light through
 
   // light
-  vec3 sunCol = mix(vec3(1.0, 0.95, 0.86), vec3(1.0, 0.50, 0.26), env.twilight)*env.day*(1.0 - rain*0.7);
+  // at sunrise and sunset the sun still lights the clouds, with a warm white: without it they only get the dim
+  // glow and the blue ambient, and turn grey like rain clouds
+  float sunAmount = env.day + 0.7*env.twilight;
+  vec3 sunCol = mix(vec3(1.0, 0.95, 0.86), vec3(1.0, 0.76, 0.58), env.twilight)*sunAmount*(1.0 - rain*0.7);
   vec3 moonCol = vec3(0.30, 0.38, 0.55)*env.night;
   // the underside is lit by the sky above: BR_CLOUD_ZENITH is how much of the zenith color it takes, the rest is a
   // plain light grey of the same brightness
   vec3 zenithLight = sky.zenith*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
   vec3 ambient = mix(vec3_splat(dot(zenithLight, vec3(0.33, 0.33, 0.33))*1.15), zenithLight, BR_CLOUD_ZENITH);
+  ambient += sky.dawnHorizon*(0.12*env.twilight*(1.0 - rain)); // a pink light from the low sun, not blue grey
   ambient = mix(ambient, vec3_splat(dot(ambient, vec3(0.33, 0.33, 0.33)))*0.75, rain*0.8);
   // at sunrise and sunset the clouds that face the sun glow, the ones that look away stay dim
   vec2 across = normalize(dir.xz + vec2(1e-4, 0.0));
@@ -75,6 +79,16 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   vec3 glow = vec3(1.0, 0.62, 0.38)*env.twilight*(0.25 + 0.75*facing)*(1.0 - rain);
   vec3 col = ambient*(0.8 - 0.3*body) + (sunCol + moonCol)*lit*(0.55 + 0.3*rim) + glow*(0.5 + 0.5*rim)*(1.0 - 0.3*body);
   col += sunCol*pow(max(dot(dir, env.sunDir), 0.0), 6.0)*rim*density*0.6; // silver lining
+
+  // rain and night: the clouds keep a color of their own, a plain light grey in rain and a faint cold tone at night,
+  // and only take a part of the color of the sky behind them (BR_CLOUD_SKY_BLEND), so they sit in the sky
+  vec3 skyHere = brRenderSky(sky, dir);
+  float skyLuma = dot(skyHere, vec3(0.33, 0.33, 0.33));
+  vec3 rainCol = vec3_splat(skyLuma)*(1.5 - 0.4*body);
+  vec3 nightCol = skyHere*(2.2 - 0.4*body) + vec3(0.09, 0.12, 0.18)*(0.5*lit*(0.4 + 0.6*rim))*env.night;
+  vec3 own = mix(col, rainCol, rain);
+  own = mix(own, nightCol, env.night*(1.0 - rain));
+  col = mix(own, skyHere, BR_CLOUD_SKY_BLEND*max(rain, env.night));
 
   // clouds fade into the haze at the horizon
   float fade = smoothstep(0.0, 0.22, up);
