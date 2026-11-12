@@ -89,8 +89,8 @@
 // Night
 #define BR_END_AMBIENT 1.7 // 0.8 dark ~ 2.2 bright, the light on the islands of the End
 #define BR_END_AMBIENT_COL vec3(0.88, 0.90, 1.10) // soft blue, the color of the End sky and fog
-#define BR_NIGHT_DARKNESS 0.9 // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept
-#define BR_MOONLIGHT      0.10 // 0.0 none ~ 1.0 full, brightness left under the open night sky
+#define BR_NIGHT_DARKNESS 0.8 // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept
+#define BR_MOONLIGHT      0.22 // 0.0 none ~ 1.0 full, brightness left under the open night sky
 #define BR_MOONLIGHT_COL  vec3(0.62, 0.78, 1.1) // tint of the moonlit surfaces
 
 // Sun and moon light color on the world

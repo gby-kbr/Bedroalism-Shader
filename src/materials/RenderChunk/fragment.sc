@@ -139,10 +139,11 @@ void main() {
         float outdoorMask = smoothstep(0.86, 0.93, shadowUV.y); // full only at sky light 15, 14 and below is indoors
         float shadow = 1.0 - smoothstep(0.860, 0.875, pow(shadowUV.y, 2.0));
         shadow = mix(shadow, 0.0, min(pow(shadowUV.x*1.2, 6.0), 1.0)); // no shadow near torch light
-        diffuse.rgb *= 1.0 - BR_SHADOW*shadow*rainShadowMask*nightShadowMask*worldMask;
-
-        float sideShadow = 1.0 - smoothstep(0.62, 0.64, v_color0.g); // the x faces and the bottom of blocks
-        diffuse.rgb *= 1.0 - BR_SIDE_SHADOW*sideShadow*outdoorMask*rainShadowMask*nightShadowMask*worldMask;
+        // the x faces and the bottom of blocks, found from the geometry: the vertex color also carries the biome tint,
+        // which made whole dark green leaves count as side faces. The darker of the two shadows is used, they do not add up
+        float sideShadow = max(smoothstep(0.4, 0.6, abs(geoNormal.x)), smoothstep(-0.4, -0.6, geoNormal.y));
+        float dark = max(BR_SHADOW*shadow, BR_SIDE_SHADOW*sideShadow*outdoorMask);
+        diffuse.rgb *= 1.0 - dark*rainShadowMask*nightShadowMask*worldMask;
 
         // rain wets open ground, flat ground gets puddles with rings of drops (not on leaves and plants)
 #if defined(ALPHA_TEST) || defined(SEASONS) || defined(TRANSPARENT)
