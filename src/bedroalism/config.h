@@ -16,7 +16,7 @@
 
 // Sun and moon, the SunMoon material and the light direction share these
 #define BR_SUN_SIZE        2.0   // 0.3 tiny ~ 4.0 massive
-#define BR_MOON_SIZE       2.2   // 0.3 tiny ~ 4.0 massive
+#define BR_MOON_SIZE       2.4   // 0.3 tiny ~ 4.0 massive
 #define BR_SUNMOON_GLOW    1.0   // 0.0 none ~ 2.0 strong, the soft glow around the sun and the moon
 #define BR_SUN_PATH_YAW    10.0   // degrees, turns the path around the vertical axis
 #define BR_MOON_PATH_YAW   -10.0
