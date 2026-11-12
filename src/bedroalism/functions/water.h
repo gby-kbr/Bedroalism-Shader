@@ -83,10 +83,11 @@ vec3 brWaterScatterColor(brEnvironment env, float skyLight) {
 }
 
 // everything the sky shows in one direction: gradient, sun and moon discs, and the clouds in front of them
-// discRadiance: x sun, y moon, 0.0 hides the discs
-vec3 brSkyRadiance(vec3 dir, brEnvironment env, brSkyColor sky, vec2 discRadiance, sampler2D cloudTex, float time) {
+// discRadiance: x sun, y moon, 0.0 hides the discs. skyAmount: how much of the plain gradient of the sky shows,
+// the discs and the clouds are always there
+vec3 brSkyRadiance(vec3 dir, brEnvironment env, brSkyColor sky, vec2 discRadiance, float skyAmount, sampler2D cloudTex, float time) {
   vec4 clouds = brClouds(cloudTex, dir, env, sky, time);
-  vec3 behind = brRenderSky(sky, dir) + brSunMoonDisc(dir, env, discRadiance.x, discRadiance.y)*(1.0 - clouds.a);
+  vec3 behind = brRenderSky(sky, dir)*skyAmount + brSunMoonDisc(dir, env, discRadiance.x, discRadiance.y)*(1.0 - clouds.a);
   return mix(behind, clouds.rgb, clouds.a);
 }
 
@@ -104,7 +105,7 @@ vec4 brWaterAbove(vec3 viewDir, vec3 nrm, vec2 lightmap, vec3 biomeTint, brEnvir
   // reflection: a reflected ray that would go below the horizon is held at the horizon
   vec3 refl = viewDir + 2.0*cosV*nrm;
   refl = normalize(vec3(refl.x, max(refl.y, 0.0), refl.z));
-  vec3 skyRefl = brSkyRadiance(refl, env, sky, vec2(40.0, 6.0)*BR_WATER_SUN_GLITTER, cloudTex, time);
+  vec3 skyRefl = brSkyRadiance(refl, env, sky, vec2(40.0, 6.0)*BR_WATER_SUN_GLITTER, BR_WATER_SKY_REFLECTION, cloudTex, time);
   skyRefl *= mix(0.05, 1.0, smoothstep(0.35, 0.9, lightmap.y)); // nothing of the sky in the shade
 
   // body: the longer the path through the water, the more it hides what is behind
