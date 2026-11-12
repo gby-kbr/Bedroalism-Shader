@@ -77,7 +77,6 @@
 #define BR_CLOUD_COVER 0.5  // 0.0 clear ~ 1.0 overcast, how much of the sky the clouds cover
 #define BR_CLOUD_ZENITH 0.5 // 0.0 plain cloud color ~ 1.0 full zenith color, how much the underside of the clouds takes of the sky above
 #define BR_CLOUD_SKY_BLEND 0.35 // 0.0 clouds keep their own color ~ 1.0 the color of the sky, in rain and at night
-#define BR_CLOUD_OPACITY 0.5 // 0.1 faint ~ 1.0 solid, how much the clouds hide the sky behind them
 #define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
 #define BR_CLOUD_SOFTNESS  0.2 // 0.05 sharp ~ 0.4 very soft, how wide the soft edge of the clouds is
 #define BR_CLOUD_ROUGHNESS 0.10 // 0.0 smooth ~ 0.3 ragged, how much small detail breaks the edge

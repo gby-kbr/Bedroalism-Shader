@@ -32,7 +32,7 @@ vec4 brCloudShape(sampler2D tex, vec3 dir, brEnvironment env, float time, out ve
   float soft = n.r*0.35 + n.g*0.65;
   float d = soft + (n.b - 0.5)*BR_CLOUD_ROUGHNESS;
   float edge = 1.0 - cover;
-  float density = smoothstep(edge, edge + BR_CLOUD_SOFTNESS + 0.12*rain, d)*BR_CLOUD_OPACITY; // the sun and the moon show through the same amount
+  float density = smoothstep(edge, edge + BR_CLOUD_SOFTNESS + 0.12*rain, d);
   return vec4(soft, d, density, edge);
 }
 
