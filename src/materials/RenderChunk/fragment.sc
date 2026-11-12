@@ -112,7 +112,12 @@ void main() {
 #endif
 
     if (!isWater) {
-        diffuse.rgb *= texture2D(s_LightMapTexture, v_lightmapUV).rgb;
+        vec3 lightMap = texture2D(s_LightMapTexture, v_lightmapUV).rgb;
+        // the End has no sky light, the vanilla lightmap there is dark and green: a soft ambient takes its place
+        if (env.end) {
+            lightMap = mix(BR_END_AMBIENT_COL*BR_END_AMBIENT, lightMap*BR_END_AMBIENT_COL, smoothstep(0.1, 0.8, v_lightmapUV.x)*0.5);
+        }
+        diffuse.rgb *= lightMap;
 
         // night ambient: covered places go black, open sky keeps only a dim cool moonlight
         float torch = smoothstep(0.1, 0.8, v_lightmapUV.x);
