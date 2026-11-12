@@ -62,7 +62,6 @@
 #define BR_WATER_WAVE_HEIGHT 0.7  // 0.0 flat ~ 2.0 rough
 #define BR_WATER_WAVE_SPEED  0.5  // 0.0 still ~ 2.0 fast
 #define BR_WATER_WAVE_RANGE  16.0 // blocks around the camera where the surface mesh moves
-#define BR_WATER_SKY_REFLECTION 0.1 // 0.0 none ~ 1.0 full, how much of the blue of the sky the water surface mirrors, the sun and the clouds are always mirrored
 #define BR_WATER_SUN_GLITTER 1.0  // 0.0 none ~ 2.0 strong, reflection of the sun and the moon
 #define BR_CAUSTICS          2.0  // 0.0 off ~ 2.0 strong, light pattern on the bottom of the sea, seen from above and under water
 #define BR_UNDERWATER_DENSITY 0.9 // 0.5 clearer ~ 2.0 hazier, absorption and haze under the surface
