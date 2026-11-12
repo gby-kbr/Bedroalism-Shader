@@ -75,7 +75,8 @@
 
 // Clouds
 #define BR_CLOUD_COVER 0.5  // 0.0 clear ~ 1.0 overcast, how much of the sky the clouds cover
-#define BR_CLOUD_HORIZON 1.0 // 0.0 plain cloud color ~ 1.0 full horizon color, how much the clouds take of the color of the horizon
+#define BR_CLOUD_ZENITH  0.25 // 0.0 ~ 1.0, how much of the zenith color the clouds take (zenith and horizon together 1.0 is the full sky color)
+#define BR_CLOUD_HORIZON 0.75 // 0.0 ~ 1.0, how much of the horizon color the clouds take, the rest is a plain light grey
 #define BR_CLOUD_SKY_BLEND 0.35 // 0.0 clouds keep their own color ~ 1.0 the color of the sky, in rain and at night
 #define BR_CLOUD_WIND  0.05 // 0.0 still ~ 1.0 fast, how fast the clouds drift with the wind
 #define BR_CLOUD_SOFTNESS  0.2 // 0.05 sharp ~ 0.4 very soft, how wide the soft edge of the clouds is
