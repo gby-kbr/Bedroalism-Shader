@@ -23,7 +23,7 @@
 #define BR_SUN_PATH_TILT   25.0  // degrees, tilts the path, 0.0 passes straight overhead
 #define BR_MOON_PATH_TILT -20.0
 
-// Sky colors, linear, from Newb X
+// Sky color
 #define BR_DAY_ZENITH_COL    vec3(0.3, 0.9, 2.0)
 #define BR_DAY_HORIZON_COL   vec3(0.5, 1.15, 1.95)
 
@@ -58,7 +58,7 @@
 
 // Water
 #define BR_WATER_COLOR       vec3(0.030, 0.270, 0.340) // linear color of the light scattered back by clear water
-#define BR_WATER_OPACITY     0.35 // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
+#define BR_WATER_OPACITY     0.2  // 0.1 glass clear ~ 0.7 murky, how much of the bottom is hidden looking straight down
 #define BR_WATER_WAVE_HEIGHT 0.7  // 0.0 flat ~ 2.0 rough
 #define BR_WATER_WAVE_SPEED  0.5  // 0.0 still ~ 2.0 fast
 #define BR_WATER_WAVE_RANGE  16.0 // blocks around the camera where the surface mesh moves
@@ -82,16 +82,16 @@
 
 // Shadows
 #define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
-#define BR_SIDE_SHADOW 0.8 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
+#define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 // End
 #define BR_END_FOG_COL vec3(0.518, 0.518, 0.667) // must match fog_color #8484AA in mcpack/fogs/the_end_fog_setting.json, it also detects the End (keep red equal to green)
 
 // Night
-#define BR_END_AMBIENT 1.7 // 0.8 dark ~ 2.2 bright, the light on the islands of the End
+#define BR_END_AMBIENT 1.25 // 0.8 dark ~ 2.2 bright, the light on the islands of the End
 #define BR_END_AMBIENT_COL vec3(0.88, 0.90, 1.10) // soft blue, the color of the End sky and fog
-#define BR_NIGHT_DARKNESS 0.8 // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept
-#define BR_MOONLIGHT      0.22 // 0.0 none ~ 1.0 full, brightness left under the open night sky
+#define BR_NIGHT_DARKNESS 0.7 // 0.0 vanilla ~ 1.0 zero ambient in covered places, torch light is kept
+#define BR_MOONLIGHT      0.2 // 0.0 none ~ 1.0 full, brightness left under the open night sky
 #define BR_MOONLIGHT_COL  vec3(0.62, 0.78, 1.1) // tint of the moonlit surfaces
 
 // Sun and moon light color on the world
