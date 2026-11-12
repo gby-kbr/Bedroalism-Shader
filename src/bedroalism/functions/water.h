@@ -27,14 +27,16 @@ vec3 brWaveTerm(vec2 p, float t, vec2 K, float slope) {
   return vec3(crest - 0.466*amp, k.x*slopeAlong, k.y*slopeAlong); // 0.466 is the mean of exp(sin(x) - 1)
 }
 
-// height and slope of the whole surface
-vec3 brWaterSurface(vec2 p, float t) {
+// height and slope of the whole surface. coarse: only the 3 long waves, the short ones cannot be seen from afar
+vec3 brWaterSurface(vec2 p, float t, bool coarse) {
   vec3 s = brWaveTerm(p, t, vec2(72.0, 26.0), 0.065);
   s += brWaveTerm(p, t, vec2(-41.0, 95.0), 0.058);
   s += brWaveTerm(p, t, vec2(150.0, -60.0), 0.052);
-  s += brWaveTerm(p, t, vec2(-120.0, -250.0), 0.046);
-  s += brWaveTerm(p, t, vec2(330.0, 190.0), 0.040);
-  s += brWaveTerm(p, t, vec2(-300.0, 520.0), 0.032);
+  if (!coarse) {
+    s += brWaveTerm(p, t, vec2(-120.0, -250.0), 0.046);
+    s += brWaveTerm(p, t, vec2(330.0, 190.0), 0.040);
+    s += brWaveTerm(p, t, vec2(-300.0, 520.0), 0.032);
+  }
   return s;
 }
 
@@ -47,12 +49,12 @@ vec2 brWaterCoord(vec2 relXZ, vec2 cameraXZ) {
 // how far the surface mesh moves at this position (blocks, up is positive), 0.0 outside the range
 float brWaterDisplacement(vec2 p, float t, float camDist) {
   float fade = 1.0 - smoothstep(0.6*BR_WATER_WAVE_RANGE, BR_WATER_WAVE_RANGE, camDist);
-  return clamp(brWaterSurface(p, t).x, -0.09, 0.09)*fade;
+  return clamp(brWaterSurface(p, t, false).x, -0.09, 0.09)*fade;
 }
 
 // normal of the surface, pointing up. far away the slopes fade out so the surface does not sparkle
 vec3 brWaterNormal(vec2 p, float t, float camDist) {
-  vec3 s = brWaterSurface(p, t);
+  vec3 s = brWaterSurface(p, t, camDist > 60.0);
   float fade = 1.0 - 0.85*smoothstep(40.0, 200.0, camDist);
   return normalize(vec3(-s.y*fade, 1.0, -s.z*fade));
 }

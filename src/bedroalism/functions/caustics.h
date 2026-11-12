@@ -43,7 +43,7 @@ vec3 brCausticLight(sampler2D tex, vec2 p, float t, float depth) {
   float d2 = depth*(1.0 + 0.22*sin(0.7*t + 4.1));
   vec3 disp = vec3(0.93, 1.0, 1.07);                       // red is bent least, blue most
   vec3 l1 = vec3(dot(c1, brCausticDepthWeights(d1*disp.x)), dot(c1, brCausticDepthWeights(d1*disp.y)), dot(c1, brCausticDepthWeights(d1*disp.z)));
-  vec3 l2 = vec3(dot(c2, brCausticDepthWeights(d2*disp.x)), dot(c2, brCausticDepthWeights(d2*disp.y)), dot(c2, brCausticDepthWeights(d2*disp.z)));
+  vec3 l2 = vec3_splat(dot(c2, brCausticDepthWeights(d2))); // the second layer has no color split, 2 evaluations less
 
   // two surfaces cross: where both focus, the light piles up
   return sqrt(l1*l2)*1.45;
