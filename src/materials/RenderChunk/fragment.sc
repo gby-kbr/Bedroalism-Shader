@@ -142,7 +142,10 @@ void main() {
         diffuse.rgb *= 1.0 - BR_SHADOW*shadow*rainShadowMask*nightShadowMask*worldMask;
 
         float sideShadow = 1.0 - smoothstep(0.62, 0.64, v_color0.g); // the x faces and the bottom of blocks
-        diffuse.rgb *= 1.0 - BR_SIDE_SHADOW*sideShadow*outdoorMask*rainShadowMask*nightShadowMask*worldMask;
+        // the game already darkens these faces with the vertex color (x faces 0.6, bottom 0.5): only the rest of the
+        // darkness is added, so BR_SIDE_SHADOW is the total darkness of the face, the same as BR_SHADOW
+        float sideRemain = min((1.0 - BR_SIDE_SHADOW)/0.55, 1.0);
+        diffuse.rgb *= mix(1.0, sideRemain, sideShadow*outdoorMask*rainShadowMask*nightShadowMask*worldMask);
 
         // rain wets open ground, flat ground gets puddles with rings of drops (not on leaves and plants)
 #if defined(ALPHA_TEST) || defined(SEASONS) || defined(TRANSPARENT)
