@@ -67,10 +67,10 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   float sunAmount = env.day + 0.7*env.twilight;
   vec3 sunCol = mix(vec3(1.0, 0.95, 0.86), vec3(1.0, 0.76, 0.58), env.twilight)*sunAmount*(1.0 - rain*0.7);
   vec3 moonCol = vec3(0.30, 0.38, 0.55)*env.night;
-  // the underside is lit by the sky above: BR_CLOUD_ZENITH is how much of the zenith color it takes, the rest is a
+  // the clouds follow the color of the horizon: BR_CLOUD_HORIZON is how much of it they take, the rest is a
   // plain light grey of the same brightness
-  vec3 zenithLight = sky.zenith*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
-  vec3 ambient = mix(vec3_splat(dot(zenithLight, vec3(0.33, 0.33, 0.33))*1.15), zenithLight, BR_CLOUD_ZENITH);
+  vec3 horizonLight = sky.horizon*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
+  vec3 ambient = mix(vec3_splat(dot(horizonLight, vec3(0.33, 0.33, 0.33))*1.15), horizonLight, BR_CLOUD_HORIZON);
   ambient += sky.dawnHorizon*(0.12*env.twilight*(1.0 - rain)); // a pink light from the low sun, not blue grey
   ambient = mix(ambient, vec3_splat(dot(ambient, vec3(0.33, 0.33, 0.33)))*0.75, rain*0.8);
   // at sunrise and sunset the clouds that face the sun glow, the ones that look away stay dim
