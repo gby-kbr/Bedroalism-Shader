@@ -65,9 +65,6 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   vec3 sunCol = mix(vec3(1.0, 0.95, 0.86), vec3(1.0, 0.50, 0.26), env.twilight)*env.day*(1.0 - rain*0.7);
   vec3 moonCol = vec3(0.30, 0.38, 0.55)*env.night;
   vec3 ambient = mix(sky.horizon, sky.zenith, 0.5)*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
-  // the sky is a deep blue, but the underside of a cloud is lit by the whole sky and looks light blue-white
-  float ambientLuma = dot(ambient, vec3(0.33, 0.33, 0.33));
-  ambient = mix(ambient, vec3_splat(ambientLuma*1.15), BR_CLOUD_WHITENESS*(1.0 - rain));
   ambient = mix(ambient, vec3_splat(dot(ambient, vec3(0.33, 0.33, 0.33)))*0.75, rain*0.8);
   // at sunrise and sunset the clouds that face the sun glow, the ones that look away stay dim
   vec2 across = normalize(dir.xz + vec2(1e-4, 0.0));

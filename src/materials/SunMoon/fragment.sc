@@ -18,8 +18,7 @@ void main() {
     // the sun and the moon are far behind the clouds, so the clouds in that direction hide them
     brEnvironment env = brDetectEnvironment(TimeOfDay.x, FogColor.rgb, FogAndDistanceControl.xyz);
     float hidden = brCloudCover(s_BrCloudNoise, normalize(v_worldPos), env, v_time.x);
-    // both are scaled: the blend of the game may add the color (the alpha is ignored) or mix it by the alpha
-    color *= 1.0 - hidden;
+    color.a *= 1.0 - hidden;
 
     gl_FragColor = vec4(brColorCorrection(color.rgb), color.a);
 }
