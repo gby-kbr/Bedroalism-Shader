@@ -63,8 +63,11 @@ void main() {
     vec3 fogMul;
     vec3 fogAdd;
     brFogTerms(relPos, relPos.xz + CameraPosition.xz, CameraPosition.y, 1.0, FogAndDistanceControl.z, ViewPositionAndTime.w, env, fog.rgb, fog.a, fogMul, fogAdd);
-    v_fogMul = vec4(fogMul, 0.0);
-    v_fogAdd = vec4(fogAdd, 0.0);
+    // the player in the pause menu and the items in the inventory are drawn with this material too, but outside of
+    // the world: there is no render distance or the model is far from the camera, and our fog would wash them out
+    float inWorld = FogAndDistanceControl.z > 8.0 && length(relPos) < FogAndDistanceControl.z*1.5 ? 1.0 : 0.0;
+    v_fogMul = vec4(mix(vec3_splat(1.0), fogMul, inWorld), 0.0);
+    v_fogAdd = vec4(fogAdd*inWorld, 0.0);
 
     v_clipPosition = position;
     v_fog = fog;
