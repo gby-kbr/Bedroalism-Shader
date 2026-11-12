@@ -117,7 +117,7 @@ void main() {
         if (env.end) {
             lightMap = mix(BR_END_AMBIENT_COL*BR_END_AMBIENT, lightMap*BR_END_AMBIENT_COL, smoothstep(0.1, 0.8, v_lightmapUV.x)*0.5);
         }
-        diffuse.rgb *= lightMap;
+        diffuse.rgb *= brTorchLight(lightMap, v_lightmapUV.x, v_lightmapUV.y, env, ViewPositionAndTime.w);
 
         // night ambient: covered places go black, open sky keeps only a dim cool moonlight
         float torch = smoothstep(0.1, 0.8, v_lightmapUV.x);

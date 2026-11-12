@@ -103,4 +103,10 @@
 #define BR_STAR_BRIGHTNESS 1.5 // 0.0 off ~ 2.0 bright, how bright the stars are
 #define BR_STAR_LINES      0.0 // 0.0 no lines ~ 1.0 clear, draws the figures of the constellations
 
+// Torches and glowing blocks
+#define BR_TORCH_COL       vec3(1.0, 0.52, 0.18) // color of the light of fire
+#define BR_TORCH_AMOUNT    1.0  // 0.0 vanilla color ~ 1.0 only the torch color, where torch light dominates
+#define BR_TORCH_INTENSITY 0.5  // 0.0 none ~ 2.0 strong, extra brightness near a torch or a glowing block
+#define BR_TORCH_FLICKER   0.2  // 0.0 steady ~ 1.0 strong, how much the light of the flame flickers
+
 #endif
