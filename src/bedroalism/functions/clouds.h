@@ -64,7 +64,10 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   // light
   vec3 sunCol = mix(vec3(1.0, 0.95, 0.86), vec3(1.0, 0.50, 0.26), env.twilight)*env.day*(1.0 - rain*0.7);
   vec3 moonCol = vec3(0.30, 0.38, 0.55)*env.night;
-  vec3 ambient = mix(sky.horizon, sky.zenith, 0.5)*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
+  // the underside is lit by the sky above: BR_CLOUD_ZENITH is how much of the zenith color it takes, the rest is a
+  // plain light grey of the same brightness
+  vec3 zenithLight = sky.zenith*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
+  vec3 ambient = mix(vec3_splat(dot(zenithLight, vec3(0.33, 0.33, 0.33))*1.15), zenithLight, BR_CLOUD_ZENITH);
   ambient = mix(ambient, vec3_splat(dot(ambient, vec3(0.33, 0.33, 0.33)))*0.75, rain*0.8);
   // at sunrise and sunset the clouds that face the sun glow, the ones that look away stay dim
   vec2 across = normalize(dir.xz + vec2(1e-4, 0.0));
