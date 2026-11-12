@@ -63,7 +63,7 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
 
   // light
   vec3 sunCol = mix(vec3(1.0, 0.95, 0.86), vec3(1.0, 0.50, 0.26), env.twilight)*env.day*(1.0 - rain*0.7);
-  vec3 moonCol = vec3(0.30, 0.38, 0.55)*env.night;
+  vec3 moonCol = vec3(0.09, 0.12, 0.18)*env.night; // the moon is dim, the clouds at night must stay close to the sky
   vec3 ambient = mix(sky.horizon, sky.zenith, 0.5)*(0.55 + 0.25*env.day + 0.2*env.twilight) + moonCol*0.2;
   // the sky is a deep blue, but the underside of a cloud is lit by the whole sky and looks light blue-white
   float ambientLuma = dot(ambient, vec3(0.33, 0.33, 0.33));
@@ -75,6 +75,15 @@ vec4 brClouds(sampler2D tex, vec3 dir, brEnvironment env, brSkyColor sky, float 
   vec3 glow = vec3(1.0, 0.62, 0.38)*env.twilight*(0.25 + 0.75*facing)*(1.0 - rain);
   vec3 col = ambient*(0.8 - 0.3*body) + (sunCol + moonCol)*lit*(0.55 + 0.3*rim) + glow*(0.5 + 0.5*rim)*(1.0 - 0.3*body);
   col += sunCol*pow(max(dot(dir, env.sunDir), 0.0), 6.0)*rim*density*0.6; // silver lining
+
+  // overcast and night: the clouds take the brightness of the sky behind them. In rain a neutral grey that is
+  // never darker than the sky, at night only a little lighter than the sky, so neither is out of balance
+  vec3 skyHere = brRenderSky(sky, dir);
+  float skyLuma = dot(skyHere, vec3(0.33, 0.33, 0.33));
+  vec3 rainCol = vec3_splat(skyLuma)*(1.1 - 0.1*body);
+  vec3 nightCol = skyHere*(1.15 - 0.1*body) + moonCol*lit*0.5*rim;
+  col = mix(col, rainCol, rain*BR_RAIN_CLOUD_GREY);
+  col = mix(col, nightCol, env.night*(1.0 - rain));
 
   // clouds fade into the haze at the horizon
   float fade = smoothstep(0.0, 0.22, up);
