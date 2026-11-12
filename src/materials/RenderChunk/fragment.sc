@@ -130,22 +130,22 @@ void main() {
         vec3 lightCol = v_sunLight.rgb;
         diffuse.rgb *= mix(vec3_splat(1.0), lightCol, skyLit*(1.0 - torch)*(env.overworld && !env.underwater ? 1.0 : 0.0));
 
-        // shadows of Aerotion, from the lightmap uv where sky light 15 is 15/16: the shadow under leaves and
-        // overhangs, and the shadow on the sides of blocks, only outdoors. Gone at night and in the rain
-        float rainShadowMask = 1.0 - env.rainFactor;
-        float nightShadowMask = 1.0 - env.night;
+        // shadows of Aerotion, as they are there: from the lightmap uv where sky light 15 is 15/16, the shadow under
+        // leaves and overhangs, and the shadow on the sides of blocks, only outdoors. Only the overworld has them, and
+        // in the rain and at night they stay at BR_SHADOW_WEATHER_KEEP of their strength
+        float rainShadowMask = mix(1.0, BR_SHADOW_WEATHER_KEEP, env.rainFactor);
+        float nightShadowMask = mix(1.0, BR_SHADOW_WEATHER_KEEP, 1.0 - smoothstep(-0.12, 0.25, env.dayFactor)); // eased night mask, the curve of the sky
         float worldMask = env.overworld && !env.underwater ? 1.0 : 0.0;
         vec2 shadowUV = v_water.zw;
-        float outdoorMask = smoothstep(0.86, 0.93, shadowUV.y); // full only at sky light 15, 14 and below is indoors
-        float shadow = 1.0 - smoothstep(0.860, 0.875, pow(shadowUV.y, 2.0));
+        // the side shadow only exists outdoors, where sun and moon light reaches: none indoors or in caves
+        float outdoorMask = smoothstep(0.86, 0.93, shadowUV.y); // full only at sky light 15 (15/16), 14 and below is indoors
+        float shadow = 1.0 - smoothstep(0.860, 0.875, pow(shadowUV.y, 2.0)); // smoothstep(0.875, 0.860, x) with the edges in order
         shadow = mix(shadow, 0.0, min(pow(shadowUV.x*1.2, 6.0), 1.0)); // no shadow near torch light
         diffuse.rgb *= 1.0 - BR_SHADOW*shadow*rainShadowMask*nightShadowMask*worldMask;
 
-        float sideShadow = 1.0 - smoothstep(0.62, 0.64, v_color0.g); // the x faces and the bottom of blocks
-        // the game already darkens these faces with the vertex color (x faces 0.6, bottom 0.5): only the rest of the
-        // darkness is added, so BR_SIDE_SHADOW is the total darkness of the face, the same as BR_SHADOW
-        float sideRemain = min((1.0 - BR_SIDE_SHADOW)/0.55, 1.0);
-        diffuse.rgb *= mix(1.0, sideRemain, sideShadow*outdoorMask*rainShadowMask*nightShadowMask*worldMask);
+        // the x faces and the bottom of blocks, from the vertex color (water is not in this branch)
+        float sideShadow = 1.0 - smoothstep(0.62, 0.64, v_color0.g);
+        diffuse.rgb *= 1.0 - BR_SIDE_SHADOW*sideShadow*outdoorMask*rainShadowMask*nightShadowMask*worldMask;
 
         // rain wets open ground, flat ground gets puddles with rings of drops (not on leaves and plants)
 #if defined(ALPHA_TEST) || defined(SEASONS) || defined(TRANSPARENT)

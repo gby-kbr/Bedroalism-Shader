@@ -83,6 +83,7 @@
 
 // Shadows
 #define BR_SHADOW      0.65 // 0.0 none ~ 1.0 black, the shadow under leaves and overhangs
+#define BR_SHADOW_WEATHER_KEEP 0.25 // 0.0 no shadows in rain and at night ~ 1.0 as strong as by day, 0.25 is Aerotion
 #define BR_SIDE_SHADOW 0.65 // 0.0 none ~ 1.0 black, the shadow on the sides of blocks
 
 // End
